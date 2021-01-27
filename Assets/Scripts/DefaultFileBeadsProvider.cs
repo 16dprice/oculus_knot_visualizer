@@ -27,7 +27,6 @@ public class DefaultFileBeadsProvider: ILinkBeadsProvider
                         {
                                 linkList.Add(componentPoints.ToArray());
                                 componentPoints = new List<Vector3>();
-                                Debug.Log("message");
                         }
                 }
 
