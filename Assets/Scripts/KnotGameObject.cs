@@ -55,8 +55,11 @@ public class KnotGameObject : MonoBehaviour
 
         foreach (var meshObject in knotMeshObjects)
         {
-            meshObject.transform.parent = transform;
-            ResetTransform(meshObject);
+            if (meshObject != null)
+            {
+                meshObject.transform.parent = transform;
+                ResetTransform(meshObject);
+            }
         }
     }
 
