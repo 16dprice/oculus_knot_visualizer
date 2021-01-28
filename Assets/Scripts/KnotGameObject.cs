@@ -3,11 +3,11 @@ using UnityEngine;
 
 public class KnotGameObject : MonoBehaviour
 {
-    [SerializeField] float radius = 0.5f;
-    [SerializeField] [Range(3, 20)] int sides = 6;
-    [SerializeField] private int crossingNumber = 3;
-    [SerializeField] private int ordering = 1;
-    [SerializeField] private int numComponents = 1;
+    [SerializeField] float radius {get; set;} = 0.5f;
+    [SerializeField] int sides {get; set;} = 6;
+    public int crossingNumber {get; set;} = 3;
+    public int ordering {get; set;} = 1;
+    [SerializeField] int numComponents {get; set;} = 1;
 
     private float _previousRadius = 0.5f;
     private int _previousSides = 6;
@@ -15,6 +15,8 @@ public class KnotGameObject : MonoBehaviour
     private int _previousCrossingNumber = 3;
     private int _previousOrdering = 1;
     private int _previousNumComponents = 1;
+
+
 
     void Start()
     {
