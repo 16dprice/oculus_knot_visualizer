@@ -7,7 +7,7 @@ public class DefaultFileBeadsProvider: ILinkBeadsProvider
 
         public DefaultFileBeadsProvider(int crossingNumber, int ordering, int numComponents = 1)
         {
-                _linkPointsTextFile = DefaultFileAccessor.GetTextAsset(crossingNumber, ordering, numComponents);
+                _linkPointsTextFile = DefaultFileAccessor.GetTextAsset(crossingNumber, ordering, numComponents);                
         }
 
         public List<Vector3[]> GetBeadsList()
@@ -21,6 +21,7 @@ public class DefaultFileBeadsProvider: ILinkBeadsProvider
                 foreach(var line in points)
                 {
                         var point = ParseTextFileLineIntoVector(line);
+
                         if (point != null) componentPoints.Add(point.Value);
 
                         if (string.IsNullOrWhiteSpace(line))

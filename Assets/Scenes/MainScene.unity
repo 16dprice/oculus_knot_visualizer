@@ -435,8 +435,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 0.5
-  sides: 8
-  crossingNumber: 7
+  sides: 6
+  crossingNumber: 3
   ordering: 1
   numComponents: 1
 --- !u!4 &1652341247

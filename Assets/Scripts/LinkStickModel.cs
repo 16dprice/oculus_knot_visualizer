@@ -26,7 +26,8 @@ public class LinkStickModel
 
     private GameObject GetKnotMeshObject(Vector3[] beads, int sides, float radius)
     {
-        if(beads.Length < 3) return null;
+        if (beads.Length < 3) return null;
+
 
         var newKnot = new GameObject();
 

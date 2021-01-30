@@ -2,20 +2,27 @@ using UnityEngine;
 
 public class DefaultFileAccessor
 {
-    private const string DefaultLocation = "PointsFiles/Default";
+    private static string DefaultLocation = System.IO.Path.Combine("PointsFiles","Default");
 
-    public static TextAsset GetTextAsset(int crossingNumber, int ordering, int numComponents = 1)
+    public static TextAsset GetTextAsset(int crossingNumber, int ordering, int numComponents)
     {
         string fileName;
         
         if (numComponents == 1)
         {
-            fileName = $"{DefaultLocation}/Knots/{crossingNumber}_crossings/knot_{crossingNumber}_{ordering}";            
+            fileName =
+            System.IO.Path.Combine(
+                $"{DefaultLocation}","Knots",$"{crossingNumber}_crossings",
+                $"knot_{crossingNumber}_{ordering}"
+            );
         }
         else
         {
             fileName =
-                $"{DefaultLocation}/Links/{crossingNumber}_crossings/link_{crossingNumber}_{numComponents}_{ordering}";
+            System.IO.Path.Combine(
+                $"{DefaultLocation}","Links",$"{crossingNumber}_crossings",
+                $"link_{crossingNumber}_{numComponents}_{ordering}"
+            );
         }
 
         return Resources.Load(fileName) as TextAsset;
