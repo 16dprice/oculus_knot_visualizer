@@ -27,16 +27,16 @@ namespace PDCodeGeneration
         private int GetNumCrossings()
         {
             var beadsList = GetBeadsList();
-            var flatList = new List<BeadPair>();
+            var flatList = new List<PDCodeBeadPair>();
 
             foreach (var beadList in beadsList)
             {
                 for (int i = 0; i < beadList.Count - 1; i++)
                 {
-                    flatList.Add(new BeadPair(beadList[i], beadList[i + 1]));
+                    flatList.Add(new PDCodeBeadPair(beadList[i], beadList[i + 1]));
                 }
 
-                flatList.Add(new BeadPair(beadList[beadList.Count - 1], beadList[0]));
+                flatList.Add(new PDCodeBeadPair(beadList[beadList.Count - 1], beadList[0]));
             }
 
             var numCrossings = 0;

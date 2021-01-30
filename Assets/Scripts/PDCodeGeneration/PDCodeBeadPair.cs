@@ -1,13 +1,13 @@
 namespace PDCodeGeneration
 {
-    public class BeadPair
+    public class PDCodeBeadPair
     {
         public int componentIndex;
 
         private readonly PDCodeBead _first;
         private readonly PDCodeBead _second;
 
-        public BeadPair(PDCodeBead first, PDCodeBead second)
+        public PDCodeBeadPair(PDCodeBead first, PDCodeBead second)
         {
             _first = first;
             _second = second;
@@ -15,7 +15,7 @@ namespace PDCodeGeneration
             componentIndex = first.componentIndex;
         }
 
-        public bool DoesIntersectOtherBeadPair(BeadPair other, int numBeadsInThisComponent)
+        public bool DoesIntersectOtherBeadPair(PDCodeBeadPair other, int numBeadsInThisComponent)
         {
             if (IsBeadPairAdjacent(other, numBeadsInThisComponent)) return false;
 
@@ -47,7 +47,7 @@ namespace PDCodeGeneration
             return isOnSegmentA && isOnSegmentB;
         }
 
-        private bool IsBeadPairAdjacent(BeadPair other, int numBeadsInThisComponent)
+        private bool IsBeadPairAdjacent(PDCodeBeadPair other, int numBeadsInThisComponent)
         {
             if (
                 _first.IsBeadAdjacent(other._first, numBeadsInThisComponent) ||
