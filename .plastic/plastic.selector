@@ -1,4 +1,0 @@
-repository "oculus_knot_visualizer"
-  path "/"
-    smartbranch "/main"  
-     
