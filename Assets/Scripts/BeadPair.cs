@@ -1,5 +1,7 @@
 public class BeadPair
 {
+    public int componentIndex;
+    
     private readonly Bead _first;
     private readonly Bead _second;
     
@@ -7,10 +9,14 @@ public class BeadPair
     {
         _first = first;
         _second = second;
+
+        componentIndex = first.componentIndex;
     }
     
-    public bool DoesIntersectOtherBeadPair(BeadPair other)
+    public bool DoesIntersectOtherBeadPair(BeadPair other, int numBeadsInThisComponent)
     {
+        if (IsBeadPairAdjacent(other, numBeadsInThisComponent)) return false;
+        
         var x1 = _first.position.x;
         var y1 = _first.position.y;
         var x3 = _second.position.x;
@@ -37,5 +43,17 @@ public class BeadPair
         if (0 < segmentBParameterizationValue && segmentBParameterizationValue < 1) isOnSegmentB = true;
 
         return isOnSegmentA && isOnSegmentB;
+    }
+
+    private bool IsBeadPairAdjacent(BeadPair other, int numBeadsInThisComponent)
+    {
+        if (
+            _first.IsBeadAdjacent(other._first, numBeadsInThisComponent) ||
+            _first.IsBeadAdjacent(other._second, numBeadsInThisComponent) ||
+            _second.IsBeadAdjacent(other._first, numBeadsInThisComponent) ||
+            _second.IsBeadAdjacent(other._second, numBeadsInThisComponent)
+        ) return true;
+
+        return false;
     }
 }
