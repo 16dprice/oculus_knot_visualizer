@@ -8,7 +8,7 @@ namespace PDCodeGeneration
     {
         public static void Main()
         {
-            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(2, 1, 2));
+            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(7, 1));
             generator.PrintInfo();
         }
 
