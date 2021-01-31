@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 
 namespace PDCodeGeneration
@@ -8,15 +10,16 @@ namespace PDCodeGeneration
     {
         public static void Main()
         {
-            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(7, 1));
+            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(5, 1));
             generator.PrintInfo();
         }
 
         private readonly ILinkBeadsProvider _beadsProvider;
+        private List<Component> _componentList;
 
         public PDCodeGenerator(ILinkBeadsProvider provider)
         {
-            _beadsProvider = provider;
+            SetComponentList(provider);
         }
 
         public void PrintInfo()
@@ -24,87 +27,134 @@ namespace PDCodeGeneration
             Debug.Log(GetNumCrossings());
         }
 
-        private int GetNumCrossings()
+        private void SetComponentList(ILinkBeadsProvider provider)
         {
-            var beadsList = GetBeadsList();
-            var flatList = new List<PDCodeBeadPair>();
+            var beadsList = provider.GetBeadsList();
+            var componentList = new List<Component>();
 
-            foreach (var beadList in beadsList)
+            for (int componentIndex = 0; componentIndex < beadsList.Count; componentIndex++)
             {
-                for (int i = 0; i < beadList.Count - 1; i++)
-                {
-                    flatList.Add(new PDCodeBeadPair(beadList[i], beadList[i + 1]));
-                }
-
-                flatList.Add(new PDCodeBeadPair(beadList[beadList.Count - 1], beadList[0]));
+                componentList.Add(
+                    new Component(
+                        beadsList[componentIndex].Select(beadVector => new Bead(beadVector)).ToList(),
+                        componentIndex
+                    )
+                );
             }
 
-            var numCrossings = 0;
-            var currentStrand = 1;
-            var crossingList = new List<CrossingPair>();
-            foreach (var firstPair in flatList)
+            _componentList = componentList;
+        }
+
+        private int GetNumCrossings()
+        {
+            int numCrossings = 0;
+            int currentStrand = 1;
+            var crossingPairs = new List<CrossingPair>();
+            
+            var allBeadPairs = GetBeadPairs();
+            foreach (var component in _componentList)
             {
-                firstPair.first.strand = currentStrand;
-
-                foreach (var secondPair in flatList)
+                int numBeadsInComponent = component.GetNumBeads();
+                
+                foreach (var beadPair in allBeadPairs)
                 {
-                    if (firstPair.DoesIntersectOtherBeadPair(secondPair, beadsList[firstPair.componentIndex].Count))
+                    beadPair.first.strand = currentStrand;
+                    var crossingPair = GetCrossingPair(beadPair, component.BeadPairs, numBeadsInComponent);
+                    if (crossingPair != null)
                     {
-                        numCrossings++;
+                        crossingPairs.Add(crossingPair);
                         currentStrand++;
-
-                        crossingList.Add(new CrossingPair(firstPair, secondPair));
+                        numCrossings++;
                     }
                 }
             }
 
-            numCrossings /= 2;
-
-            foreach (var pair in flatList)
+            foreach (var crossingPair in crossingPairs)
             {
-                if (pair.first.strand > 2 * numCrossings)
-                {
-                    pair.first.strand -= 2 * numCrossings;
-                }
-
-                Debug.Log(pair.first.strand);
-            }
-
-            foreach (var crossingPair in crossingList)
-            {
-                var pdCodeCrossing = crossingPair.GetPDCodeCrossing();
-                Debug.Log(
-                    $"{pdCodeCrossing.strand1}" +
-                    $"{pdCodeCrossing.strand2}" +
-                    $"{pdCodeCrossing.strand3}" +
-                    $"{pdCodeCrossing.strand4}"
-                );
+                Debug.Log(crossingPair.GetPrintString());
             }
 
             return numCrossings;
         }
 
-        private List<List<PDCodeBead>> GetBeadsList()
+        [CanBeNull]
+        private CrossingPair GetCrossingPair(
+            PDCodeBeadPair start,
+            List<PDCodeBeadPair> allBeadPairs,
+            int numBeadsInStartComponent
+        )
         {
-            var beadsList = _beadsProvider.GetBeadsList();
-            var newBeadsList = new List<List<PDCodeBead>>();
-
-            for (int componentIndex = 0; componentIndex < beadsList.Count; componentIndex++)
+            foreach (var beadPair in allBeadPairs)
             {
-                var beadList = beadsList[componentIndex];
-                var newBeadList = new List<PDCodeBead>();
-
-                for (int beadIndex = 0; beadIndex < beadList.Length; beadIndex++)
+                if (start.DoesIntersectOtherBeadPair(beadPair, numBeadsInStartComponent))
                 {
-                    newBeadList.Add(
-                        new PDCodeBead(new Bead(beadList[beadIndex]), componentIndex, beadIndex)
-                    );
+                    return new CrossingPair(start, beadPair);
                 }
-
-                newBeadsList.Add(newBeadList);
             }
 
-            return newBeadsList;
+            return null;
         }
+
+        private List<PDCodeBeadPair> GetBeadPairs()
+        {
+            var pairsList = new List<PDCodeBeadPair>();
+
+            foreach (var component in _componentList)
+            {
+                pairsList = pairsList.Concat(component.BeadPairs).ToList();
+            }
+
+            return pairsList;
+        }
+
+        // private int GetNumCrossings()
+        // {
+        //     var flatList = GetBeadPairs();
+        //
+        //     var numCrossings = 0;
+        //     var currentStrand = 1;
+        //     var crossingList = new List<CrossingPair>();
+        //     foreach (var firstPair in flatList)
+        //     {
+        //         firstPair.first.strand = currentStrand;
+        //
+        //         foreach (var secondPair in flatList)
+        //         {
+        //             if (firstPair.DoesIntersectOtherBeadPair(secondPair, beadsList[firstPair.componentIndex].Count))
+        //             {
+        //                 numCrossings++;
+        //                 currentStrand++;
+        //
+        //                 crossingList.Add(new CrossingPair(firstPair, secondPair));
+        //             }
+        //         }
+        //     }
+        //
+        //     numCrossings /= 2;
+        //
+        //     foreach (var pair in flatList)
+        //     {
+        //         if (pair.first.strand > 2 * numCrossings)
+        //         {
+        //             pair.first.strand -= 2 * numCrossings;
+        //         }
+        //
+        //         Debug.Log(pair.first.strand);
+        //     }
+        //
+        //     foreach (var crossingPair in crossingList)
+        //     {
+        //         var pdCodeCrossing = crossingPair.GetPDCodeCrossing();
+        //         Debug.Log(
+        //             $"{pdCodeCrossing.strand1}" +
+        //             $"{pdCodeCrossing.strand2}" +
+        //             $"{pdCodeCrossing.strand3}" +
+        //             $"{pdCodeCrossing.strand4}"
+        //         );
+        //     }
+        //
+        //     // return numCrossings;
+        //     return -1;
+        // }
     }
 }

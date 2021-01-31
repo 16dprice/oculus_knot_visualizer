@@ -12,6 +12,13 @@ namespace PDCodeGeneration
             SetOverUnder(pair1, pair2);
         }
 
+        public string GetPrintString()
+        {
+            (int strand1, int strand2, int strand3, int strand4) = GetPDCodeCrossing();
+
+            return $"X[{strand1}, {strand2}, {strand3}, {strand4}]";
+        }
+
         public (int strand1, int strand2, int strand3, int strand4) GetPDCodeCrossing()
         {
             int strand1 = under.first.strand;
@@ -20,7 +27,6 @@ namespace PDCodeGeneration
 
             Vector2 underStrandVec = under.second.position - under.first.position;
             Vector2 overStrandVec1 = over.first.position - under.first.position;
-            Vector2 overStrandVec2 = over.second.position - under.first.position;
 
             if (Vector2.SignedAngle(underStrandVec, overStrandVec1) > 0)
             {
