@@ -8,7 +8,7 @@ namespace PDCodeGeneration
     {
         public static void Main()
         {
-            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(6, 1, 2));
+            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(2, 1, 2));
             generator.PrintInfo();
         }
 
@@ -40,16 +40,48 @@ namespace PDCodeGeneration
             }
 
             var numCrossings = 0;
+            var currentStrand = 1;
+            var crossingList = new List<CrossingPair>();
             foreach (var firstPair in flatList)
             {
+                firstPair.first.strand = currentStrand;
+
                 foreach (var secondPair in flatList)
                 {
                     if (firstPair.DoesIntersectOtherBeadPair(secondPair, beadsList[firstPair.componentIndex].Count))
+                    {
                         numCrossings++;
+                        currentStrand++;
+
+                        crossingList.Add(new CrossingPair(firstPair, secondPair));
+                    }
                 }
             }
 
-            return numCrossings / 2;
+            numCrossings /= 2;
+
+            foreach (var pair in flatList)
+            {
+                if (pair.first.strand > 2 * numCrossings)
+                {
+                    pair.first.strand -= 2 * numCrossings;
+                }
+
+                Debug.Log(pair.first.strand);
+            }
+
+            foreach (var crossingPair in crossingList)
+            {
+                var pdCodeCrossing = crossingPair.GetPDCodeCrossing();
+                Debug.Log(
+                    $"{pdCodeCrossing.strand1}" +
+                    $"{pdCodeCrossing.strand2}" +
+                    $"{pdCodeCrossing.strand3}" +
+                    $"{pdCodeCrossing.strand4}"
+                );
+            }
+
+            return numCrossings;
         }
 
         private List<List<PDCodeBead>> GetBeadsList()

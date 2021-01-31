@@ -7,6 +7,7 @@ namespace PDCodeGeneration
     {
         public Vector3 position;
         public readonly int componentIndex;
+        public int strand;
         
         private readonly int _order;
         

@@ -4,13 +4,13 @@ namespace PDCodeGeneration
     {
         public int componentIndex;
 
-        private readonly PDCodeBead _first;
-        private readonly PDCodeBead _second;
+        public PDCodeBead first;
+        public PDCodeBead second;
 
         public PDCodeBeadPair(PDCodeBead first, PDCodeBead second)
         {
-            _first = first;
-            _second = second;
+            this.first = first;
+            this.second = second;
 
             componentIndex = first.componentIndex;
         }
@@ -19,15 +19,30 @@ namespace PDCodeGeneration
         {
             if (IsBeadPairAdjacent(other, numBeadsInThisComponent)) return false;
 
-            var x1 = _first.position.x;
-            var y1 = _first.position.y;
-            var x3 = _second.position.x;
-            var y3 = _second.position.y;
+            var (thisSegmentValue, otherSegmentValue) = GetIntersectionParameterizationValues(other);
 
-            var x2 = other._first.position.x;
-            var y2 = other._first.position.y;
-            var x4 = other._second.position.x;
-            var y4 = other._second.position.y;
+            var isOnThisSegment = false;
+            var isOnOtherSegment = false;
+
+            if (0 < thisSegmentValue && thisSegmentValue < 1) isOnThisSegment = true;
+            if (0 < otherSegmentValue && otherSegmentValue < 1) isOnOtherSegment = true;
+
+            return isOnThisSegment && isOnOtherSegment;
+        }
+
+        public (float thisSegmentValue, float otherSegmentValue) GetIntersectionParameterizationValues(
+            PDCodeBeadPair other
+        )
+        {
+            var x1 = first.position.x;
+            var y1 = first.position.y;
+            var x3 = second.position.x;
+            var y3 = second.position.y;
+
+            var x2 = other.first.position.x;
+            var y2 = other.first.position.y;
+            var x4 = other.second.position.x;
+            var y4 = other.second.position.y;
 
             var slopeOfSegmentA = (y3 - y1) / (x3 - x1);
             var slopeOfSegmentB = (y4 - y2) / (x4 - x2);
@@ -38,22 +53,16 @@ namespace PDCodeGeneration
             var segmentAParameterizationValue = (intersectionXValue - x1) / (x3 - x1);
             var segmentBParameterizationValue = (intersectionXValue - x2) / (x4 - x2);
 
-            var isOnSegmentA = false;
-            var isOnSegmentB = false;
-
-            if (0 < segmentAParameterizationValue && segmentAParameterizationValue < 1) isOnSegmentA = true;
-            if (0 < segmentBParameterizationValue && segmentBParameterizationValue < 1) isOnSegmentB = true;
-
-            return isOnSegmentA && isOnSegmentB;
+            return (segmentAParameterizationValue, segmentBParameterizationValue);
         }
 
         private bool IsBeadPairAdjacent(PDCodeBeadPair other, int numBeadsInThisComponent)
         {
             if (
-                _first.IsBeadAdjacent(other._first, numBeadsInThisComponent) ||
-                _first.IsBeadAdjacent(other._second, numBeadsInThisComponent) ||
-                _second.IsBeadAdjacent(other._first, numBeadsInThisComponent) ||
-                _second.IsBeadAdjacent(other._second, numBeadsInThisComponent)
+                first.IsBeadAdjacent(other.first, numBeadsInThisComponent) ||
+                first.IsBeadAdjacent(other.second, numBeadsInThisComponent) ||
+                second.IsBeadAdjacent(other.first, numBeadsInThisComponent) ||
+                second.IsBeadAdjacent(other.second, numBeadsInThisComponent)
             ) return true;
 
             return false;
