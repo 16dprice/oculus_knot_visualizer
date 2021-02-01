@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LinkStickModel
+public class LinkStickModel 
 {
     const float PI = 3.1415926535898f;
     
@@ -28,20 +28,28 @@ public class LinkStickModel
     {
         if (beads.Length < 3) return null;
 
-
         var newKnot = new GameObject();
 
         var meshFilter = newKnot.AddComponent(typeof(MeshFilter)) as MeshFilter;
         var meshRenderer = newKnot.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
 
         var mesh = new Mesh();
-        
+
         mesh.vertices = GetVertices(beads, sides, radius);
-        mesh.triangles = GetTriangles(beads, sides);;
+        mesh.triangles = GetTriangles(beads, sides);
+        ;
         mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh; //assign the mesh
-        meshRenderer.material.SetColor("_Color", Color.white); //assign it some arbitrary color.
+        if (meshRenderer != null)
+        {
+            meshRenderer.material = new Material(Shader.Find("Specular")); //assign it some specular shader.
+            meshRenderer.material.SetColor("_Color", Color.white); //One of these have got to work
+        }
+        else
+        {
+            Debug.Log("Pink unlit shader time!");
+        }
 
         return newKnot;
     }
