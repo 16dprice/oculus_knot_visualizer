@@ -1,14 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ButtonKnotIncrementor : MonoBehaviour
 {
     KnotGameObject knotGameObject;
-    int crossingNumber;
-    int ordering;
+    int _numComponents;
+    int _crossingNumber;
+    int _ordering;
 
-    int[] numberOfKnots = {0, 0, 0, 1, 1, 2, 3, 7};
+    int[][] _numberOfLinks =
+    {
+        new int[] {0},
+        new int[] {0, 0, 0, 1, 1, 2, 3, 7},
+        new int[] {0, 0, 1, 0, 1, 1, 3},
+        new int[] {0, 0, 0, 0, 0, 0, 3},
+    };
 
     void Start()
     {
@@ -17,27 +22,34 @@ public class ButtonKnotIncrementor : MonoBehaviour
 
     void NextKnot()
     {
-        crossingNumber = knotGameObject.crossingNumber;
-        ordering = knotGameObject.ordering;
+        _numComponents = knotGameObject.numComponents;
+        _crossingNumber = knotGameObject.crossingNumber;
+        _ordering = knotGameObject.ordering;
+        
+        for ( ; _numComponents < _numberOfLinks.Length; _numComponents++)
+        {
+            for ( ; _crossingNumber < _numberOfLinks[_numComponents].Length; _crossingNumber++)
+            {
+                if (_ordering < _numberOfLinks[_numComponents][_crossingNumber]) {
+                    _ordering++;
 
-        if (ordering < numberOfKnots[crossingNumber]) ordering++;
-        else {
-            crossingNumber++;
-            ordering = 1;
+                    knotGameObject.numComponents = _numComponents;
+                    knotGameObject.crossingNumber = _crossingNumber;
+                    knotGameObject.ordering = _ordering;
+
+                    return;
+                }
+                else
+                {
+                    _ordering = 0;
+                }
+            }
+            _crossingNumber = 0;
         }
-
-        if (crossingNumber >= numberOfKnots.Length)  crossingNumber = 3;
-
-        knotGameObject.crossingNumber = crossingNumber;
-        knotGameObject.ordering = ordering;
+        
+        knotGameObject.numComponents = 1;
+        knotGameObject.crossingNumber = 3;
+        knotGameObject.ordering = 1;
     }
-
     
-    // void Update()
-    // {
-    //     if (Input.GetButtonDown("Jump"))
-    //     {
-    //         NextKnot();
-    //     }
-    // }
 }
