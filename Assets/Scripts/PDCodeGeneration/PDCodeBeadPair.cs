@@ -15,9 +15,17 @@ namespace PDCodeGeneration
             componentIndex = first.componentIndex;
         }
 
-        public bool DoesIntersectOtherBeadPair(PDCodeBeadPair other, int numBeadsInThisComponent)
+        public bool DoesHaveCrossing()
         {
-            if (IsBeadPairAdjacent(other, numBeadsInThisComponent)) return false;
+            return first.strand != second.strand;
+        }
+
+        public bool DoesIntersectOtherBeadPair(PDCodeBeadPair other, int numBeadsInThisComponent = -1)
+        {
+            if (
+                numBeadsInThisComponent != -1 &&
+                IsBeadPairAdjacent(other, numBeadsInThisComponent)
+            ) return false;
 
             var (thisSegmentValue, otherSegmentValue) = GetIntersectionParameterizationValues(other);
 

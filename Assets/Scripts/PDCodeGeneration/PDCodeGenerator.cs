@@ -10,9 +10,9 @@ namespace PDCodeGeneration
     {
         public static void Main()
         {
-            int crossingNumber = 6;
-            int ordering = 3;
-            int numComponents = 2;
+            int crossingNumber = 8;
+            int ordering = 21;
+            int numComponents = 1;
 
             var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(crossingNumber, ordering, numComponents));
             generator.PrintInfo();
@@ -51,10 +51,36 @@ namespace PDCodeGeneration
 
         private int GetNumCrossings()
         {
-            int numCrossings = 0;
-            int currentStrand = 1;
+            SetBeadStrands();
+
+            var beadPairsWithCrossings = GetBeadPairsWithCrossings();
             var crossingPairs = new List<CrossingPair>();
 
+            for (int i = 0; i < beadPairsWithCrossings.Count - 1; i++)
+            {
+                for (int j = i + 1; j < beadPairsWithCrossings.Count; j++)
+                {
+                    var firstBeadPair = beadPairsWithCrossings[i];
+                    var secondBeadPair = beadPairsWithCrossings[j];
+
+                    if (firstBeadPair.DoesIntersectOtherBeadPair(secondBeadPair))
+                    {
+                        crossingPairs.Add(new CrossingPair(firstBeadPair, secondBeadPair));
+                        break;
+                    }
+                }
+            }
+
+            foreach (var crossingPair in crossingPairs)
+            {
+                Debug.Log(crossingPair.GetPrintString());
+            }
+
+            return crossingPairs.Count;
+        }
+
+        private void SetBeadStrands()
+        {
             int initialStrandNumber = 1;
             foreach (var component in _componentList)
             {
@@ -67,88 +93,24 @@ namespace PDCodeGeneration
 
                 initialStrandNumber = component.GetMaxStrandNumber() + 1;
             }
-
-            return numCrossings;
         }
 
-        [CanBeNull]
-        private CrossingPair GetCrossingPair(
-            PDCodeBeadPair start,
-            List<PDCodeBeadPair> allBeadPairs,
-            int numBeadsInStartComponent
-        )
-        {
-            foreach (var beadPair in allBeadPairs)
-            {
-                if (start.DoesIntersectOtherBeadPair(beadPair, numBeadsInStartComponent))
-                {
-                    return new CrossingPair(start, beadPair);
-                }
-            }
-
-            return null;
-        }
-
-        private List<PDCodeBeadPair> GetBeadPairs()
+        private List<PDCodeBeadPair> GetBeadPairsWithCrossings()
         {
             var pairsList = new List<PDCodeBeadPair>();
 
             foreach (var component in _componentList)
             {
-                pairsList = pairsList.Concat(component.BeadPairs).ToList();
+                foreach (var beadPair in component.BeadPairs)
+                {
+                    if (beadPair.DoesHaveCrossing())
+                    {
+                        pairsList.Add(beadPair);
+                    }
+                }
             }
 
             return pairsList;
         }
-
-        // private int GetNumCrossings()
-        // {
-        //     var flatList = GetBeadPairs();
-        //
-        //     var numCrossings = 0;
-        //     var currentStrand = 1;
-        //     var crossingList = new List<CrossingPair>();
-        //     foreach (var firstPair in flatList)
-        //     {
-        //         firstPair.first.strand = currentStrand;
-        //
-        //         foreach (var secondPair in flatList)
-        //         {
-        //             if (firstPair.DoesIntersectOtherBeadPair(secondPair, beadsList[firstPair.componentIndex].Count))
-        //             {
-        //                 numCrossings++;
-        //                 currentStrand++;
-        //
-        //                 crossingList.Add(new CrossingPair(firstPair, secondPair));
-        //             }
-        //         }
-        //     }
-        //
-        //     numCrossings /= 2;
-        //
-        //     foreach (var pair in flatList)
-        //     {
-        //         if (pair.first.strand > 2 * numCrossings)
-        //         {
-        //             pair.first.strand -= 2 * numCrossings;
-        //         }
-        //
-        //         Debug.Log(pair.first.strand);
-        //     }
-        //
-        //     foreach (var crossingPair in crossingList)
-        //     {
-        //         var pdCodeCrossing = crossingPair.GetPDCodeCrossing();
-        //         Debug.Log(
-        //             $"{pdCodeCrossing.strand1}" +
-        //             $"{pdCodeCrossing.strand2}" +
-        //             $"{pdCodeCrossing.strand3}" +
-        //             $"{pdCodeCrossing.strand4}"
-        //         );
-        //     }
-        //
-        //     // return numCrossings;
-        //     return -1;
-        // }
     }
 }
