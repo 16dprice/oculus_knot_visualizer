@@ -10,7 +10,11 @@ namespace PDCodeGeneration
     {
         public static void Main()
         {
-            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(5, 1));
+            int crossingNumber = 6;
+            int ordering = 3;
+            int numComponents = 2;
+
+            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(crossingNumber, ordering, numComponents));
             generator.PrintInfo();
         }
 
@@ -50,28 +54,18 @@ namespace PDCodeGeneration
             int numCrossings = 0;
             int currentStrand = 1;
             var crossingPairs = new List<CrossingPair>();
-            
-            var allBeadPairs = GetBeadPairs();
+
+            int initialStrandNumber = 1;
             foreach (var component in _componentList)
             {
-                int numBeadsInComponent = component.GetNumBeads();
-                
-                foreach (var beadPair in allBeadPairs)
-                {
-                    beadPair.first.strand = currentStrand;
-                    var crossingPair = GetCrossingPair(beadPair, component.BeadPairs, numBeadsInComponent);
-                    if (crossingPair != null)
-                    {
-                        crossingPairs.Add(crossingPair);
-                        currentStrand++;
-                        numCrossings++;
-                    }
-                }
-            }
+                var exceptionList = new List<Component>() {component};
 
-            foreach (var crossingPair in crossingPairs)
-            {
-                Debug.Log(crossingPair.GetPrintString());
+                component.SetBeadStrands(
+                    initialStrandNumber,
+                    _componentList.Except(exceptionList).ToList()
+                );
+
+                initialStrandNumber = component.GetMaxStrandNumber() + 1;
             }
 
             return numCrossings;
