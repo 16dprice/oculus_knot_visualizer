@@ -28,7 +28,7 @@ namespace PDCodeGeneration
 
         public void PrintInfo()
         {
-            Debug.Log(GetNumCrossings());
+            Debug.Log(GetPDList());
         }
 
         private void SetComponentList(ILinkBeadsProvider provider)
@@ -49,7 +49,7 @@ namespace PDCodeGeneration
             _componentList = componentList;
         }
 
-        private int GetNumCrossings()
+        private List<CrossingPair> GetPDList()
         {
             SetBeadStrands();
 
@@ -76,7 +76,7 @@ namespace PDCodeGeneration
                 Debug.Log(crossingPair.GetPrintString());
             }
 
-            return crossingPairs.Count;
+            return crossingPairs;
         }
 
         private void SetBeadStrands()
