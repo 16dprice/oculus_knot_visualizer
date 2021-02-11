@@ -4,12 +4,14 @@ using UnityEngine;
 
 public class DrawBeadSpawner : MonoBehaviour
 {
-    float radius = 0.01f;
+    float radius = 0.02f;
     int sides = 6;
     
     [SerializeField] private GameObject _beadPrefab;
     private List<GameObject> _beadPrefabObjects = new List<GameObject>();
-    private List<Vector3> knot = new List<Vector3>();
+    
+    private List<Vector3> component = new List<Vector3>();
+    private List<Vector3[]> link = new List<Vector3[]>();
 
     private bool _previousTriggerState = false;
     private bool _currentTriggerState = false;
@@ -34,6 +36,15 @@ public class DrawBeadSpawner : MonoBehaviour
         {
             _drawingState = false;
             _previousTouchPos = Vector3.zero;
+            
+            if (!_previousTriggerState)
+            {
+                link.Add(component.ToArray());
+                component.Clear();
+                
+                DestroyBeads();
+                DisplayKnot();
+            }
         }
 
         if (_drawingState)
@@ -44,33 +55,26 @@ public class DrawBeadSpawner : MonoBehaviour
             {
                 var bead = Instantiate(_beadPrefab, _currentTouchPos, Quaternion.identity);
                 _beadPrefabObjects.Add(bead);
-                knot.Add(_currentTouchPos);
+                component.Add(_currentTouchPos);
                 
                 _previousTouchPos = _currentTouchPos;
             }
         }
 
         if (OVRInput.GetDown(OVRInput.Button.Two))
-            DestroyBeads();
-
-        if (OVRInput.GetDown(OVRInput.Button.One))
-        {
             DestroyKnot();
-            DisplayKnot();
-            
-            knot.Clear();
-        }
 
         _previousTriggerState = _currentTriggerState;
     }
     
     void DisplayKnot()
     {
-        //TODO: check if this is necessary
-        if (knot.Count < 3) return;
+        foreach (Transform child in this.transform)
+        {
+            Destroy(child.gameObject);
+        }
         
-        var beadsProvider = new DrawBeadsProvider(knot);
-        var stickModel = new LinkStickModel(beadsProvider);
+        var stickModel = new LinkStickModel(new DrawBeadsProvider(link));
 
         var knotMeshObjects = stickModel.GetKnotMeshObjects(sides, radius);
 
@@ -107,5 +111,7 @@ public class DrawBeadSpawner : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+        
+        link.Clear();
     }
 }
