@@ -1,34 +1,16 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
-using UnityEngine;
 
 namespace PDCodeGeneration
 {
     public class PDCodeGenerator
     {
-        public static void Main()
-        {
-            int crossingNumber = 8;
-            int ordering = 21;
-            int numComponents = 1;
-
-            var generator = new PDCodeGenerator(new DefaultFileBeadsProvider(crossingNumber, ordering, numComponents));
-            generator.PrintInfo();
-        }
-
         private readonly ILinkBeadsProvider _beadsProvider;
         private List<Component> _componentList;
 
         public PDCodeGenerator(ILinkBeadsProvider provider)
         {
             SetComponentList(provider);
-        }
-
-        public void PrintInfo()
-        {
-            Debug.Log(GetPDList());
         }
 
         private void SetComponentList(ILinkBeadsProvider provider)
@@ -49,7 +31,7 @@ namespace PDCodeGeneration
             _componentList = componentList;
         }
 
-        private List<CrossingPair> GetPDList()
+        public List<CrossingPair> GetPDList()
         {
             SetBeadStrands();
 
@@ -69,11 +51,6 @@ namespace PDCodeGeneration
                         break;
                     }
                 }
-            }
-
-            foreach (var crossingPair in crossingPairs)
-            {
-                Debug.Log(crossingPair.GetPrintString());
             }
 
             return crossingPairs;
