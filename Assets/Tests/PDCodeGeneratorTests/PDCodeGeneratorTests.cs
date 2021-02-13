@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using PDCodeGeneration;
-using UnityEngine;
-using UnityEngine.TestTools;
 
-namespace Tests
+namespace Tests.PDCodeGeneratorTests
 {
     public class NewTestScript
     {
-        public struct TestCase
+        private readonly struct TestCase
         {
             public TestCase(int crossingNumber, int ordering, int numComponents = 1)
             {
@@ -25,23 +20,57 @@ namespace Tests
             public int NumComponents { get; }
         }
 
-        public List<TestCase> GetPDListTestCases()
+        private List<TestCase> GetPDListTestCases()
         {
+            (int, int)[] numKnotsByCrossingNum =
+            {
+                (3, 1),
+                (4, 1),
+                (5, 2),
+                (6, 3),
+                (7, 7)
+            };
+
+            (int, int)[] numTwoComponentLinksByCrossingNum =
+            {
+                (2, 1),
+                (4, 1),
+                (5, 1),
+                (6, 3)
+            };
+            
+            // NOTE: We ignore the link 6_3_3 for now as this is a known exception in the code
+            // The code, as written, does not account for multiple crossings occurring over a single pair of beads
+            (int, int)[] numThreeComponentLinksByCrossingNum =
+            {
+                (6, 2)
+            };
+
             var testCases = new List<TestCase>();
 
-            List<TestCase> items;
-            using (StreamReader r = new StreamReader("Assets/Tests/PDCodeGeneratorTests/pdCodeGeneratorTestCases.json"))
-            { 
-                var json = r.ReadToEnd();
-                items = JsonUtility.FromJson<List<TestCase>>(json);
+            foreach (var (crossingNumber, numberOfKnotsWithCrossingNumber) in numKnotsByCrossingNum)
+            {
+                for (int ordering = 1; ordering <= numberOfKnotsWithCrossingNumber; ordering++)
+                {
+                    testCases.Add(new TestCase(crossingNumber, ordering));
+                }
             }
-
-            Console.WriteLine(items);
             
-            testCases.Add(new TestCase(3, 1));
-            testCases.Add(new TestCase(4, 1));
-            testCases.Add(new TestCase(5, 1));
-            testCases.Add(new TestCase(5, 2));
+            foreach (var (crossingNumber, numberOfLinksWithCrossingNumber) in numTwoComponentLinksByCrossingNum)
+            {
+                for (int ordering = 1; ordering <= numberOfLinksWithCrossingNumber; ordering++)
+                {
+                    testCases.Add(new TestCase(crossingNumber, ordering, 2));
+                }
+            }
+            
+            foreach (var (crossingNumber, numberOfLinksWithCrossingNumber) in numThreeComponentLinksByCrossingNum)
+            {
+                for (int ordering = 1; ordering <= numberOfLinksWithCrossingNumber; ordering++)
+                {
+                    testCases.Add(new TestCase(crossingNumber, ordering, 3));
+                }
+            }
 
             return testCases;
         }
