@@ -3,25 +3,25 @@ using UnityEngine;
 
 public class KnotGameObject : MonoBehaviour
 {
-    [SerializeField] float radius = 0.5f;
-    [SerializeField] [Range(3, 20)] int sides = 6;
+    [SerializeField] private float radius = 0.5f;
+    [SerializeField] [Range(3, 20)] private int sides = 6;
     [SerializeField] private int crossingNumber = 3;
     [SerializeField] private int ordering = 1;
     [SerializeField] private int numComponents = 1;
 
+    private int _previousCrossingNumber = 3;
+    private int _previousNumComponents = 1;
+    private int _previousOrdering = 1;
+
     private float _previousRadius = 0.5f;
     private int _previousSides = 6;
-    
-    private int _previousCrossingNumber = 3;
-    private int _previousOrdering = 1;
-    private int _previousNumComponents = 1;
 
-    void Start()
+    private void Start()
     {
         DisplayLink();
     }
 
-    void Update()
+    private void Update()
     {
         if (
             Math.Abs(_previousRadius - radius) > 0.1 ||
@@ -31,10 +31,7 @@ public class KnotGameObject : MonoBehaviour
             _previousNumComponents != numComponents
         )
         {
-            foreach (Transform child in transform)
-            {
-                Destroy(child.gameObject);
-            }
+            foreach (Transform child in transform) Destroy(child.gameObject);
 
             DisplayLink();
 
@@ -46,7 +43,7 @@ public class KnotGameObject : MonoBehaviour
         }
     }
 
-    void DisplayLink()
+    private void DisplayLink()
     {
         var beadsProvider = new DefaultFileBeadsProvider(crossingNumber, ordering, numComponents);
         var stickModel = new LinkStickModel(beadsProvider);
@@ -54,16 +51,14 @@ public class KnotGameObject : MonoBehaviour
         var knotMeshObjects = stickModel.GetKnotMeshObjects(sides, radius);
 
         foreach (var meshObject in knotMeshObjects)
-        {
             if (meshObject != null)
             {
                 meshObject.transform.parent = transform;
                 ResetTransform(meshObject);
             }
-        }
     }
 
-    void ResetTransform(GameObject obj)
+    private void ResetTransform(GameObject obj)
     {
         obj.transform.localPosition = Vector3.zero;
         obj.transform.rotation = Quaternion.identity;
