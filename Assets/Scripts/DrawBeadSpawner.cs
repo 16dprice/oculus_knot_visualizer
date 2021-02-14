@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿//PR: unnecessary using System.Collections
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -97,6 +98,8 @@ public class DrawBeadSpawner : MonoBehaviour
 
     void DestroyBeads()
     {
+        //PR: gameObject is also a global var that you could access in this script
+        // maybe change this to var beadPrefabObject to make it clearer?
         foreach (var gameObject in _beadPrefabObjects)
         {
             Destroy(gameObject);
@@ -107,6 +110,7 @@ public class DrawBeadSpawner : MonoBehaviour
 
     void DestroyKnot()
     {
+        //PR: unnecessary "this"
         foreach (Transform child in this.transform)
         {
             Destroy(child.gameObject);

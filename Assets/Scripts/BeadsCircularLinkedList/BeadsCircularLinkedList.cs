@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//PR: is this just old code? Should probably delete this file
+
 namespace BeadsCircularLinkedList
 {
     public class BeadsCircularLinkedList

@@ -6,6 +6,7 @@ public class KnotGameObject : MonoBehaviour
     [SerializeField] float radius = 0.5f;
     [SerializeField] int sides = 6;
     
+    //PR: name these starting with capitals since they're public class vars (i.e. public int NumComponents)
     public int numComponents {get; set;} = 1;
     public int crossingNumber {get; set;} = 3;
     public int ordering {get; set;} = 1;
@@ -33,6 +34,7 @@ public class KnotGameObject : MonoBehaviour
             _previousNumComponents != numComponents
         )
         {
+            //PR: unnecessary "this"
             foreach (Transform child in this.transform)
             {
                 Destroy(child.gameObject);

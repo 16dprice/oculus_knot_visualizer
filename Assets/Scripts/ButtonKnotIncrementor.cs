@@ -7,6 +7,7 @@ public class ButtonKnotIncrementor : MonoBehaviour
     int _crossingNumber;
     int _ordering;
 
+    //PR: no need for int[] inside of this (i.e. it can just be new[] {0} instead of new int[] {0}
     int[][] _numberOfLinks =
     {
         new int[] {0},
@@ -39,6 +40,7 @@ public class ButtonKnotIncrementor : MonoBehaviour
 
                     return;
                 }
+                //PR: unnecessary else clause. You can get rid of it entirely and just leave the _ordering = 0;
                 else
                 {
                     _ordering = 0;
