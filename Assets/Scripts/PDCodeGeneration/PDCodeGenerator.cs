@@ -76,15 +76,9 @@ namespace PDCodeGeneration
             var pairsList = new List<PDCodeBeadPair>();
 
             foreach (var component in _componentList)
-            {
                 foreach (var beadPair in component.BeadPairs)
-                {
                     if (beadPair.DoesHaveCrossing())
-                    {
                         pairsList.Add(beadPair);
-                    }
-                }
-            }
 
             return pairsList;
         }

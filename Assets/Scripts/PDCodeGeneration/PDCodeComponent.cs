@@ -82,9 +82,7 @@ namespace PDCodeGeneration
             var pdCodeBeadPairList = new List<PDCodeBeadPair>();
 
             for (int beadIndex = 0; beadIndex < _beadList.Count - 1; beadIndex++)
-            {
                 pdCodeBeadPairList.Add(new PDCodeBeadPair(_beadList[beadIndex], _beadList[beadIndex + 1]));
-            }
             pdCodeBeadPairList.Add(new PDCodeBeadPair(_beadList[_beadList.Count - 1], _beadList[0]));
 
             return pdCodeBeadPairList;
