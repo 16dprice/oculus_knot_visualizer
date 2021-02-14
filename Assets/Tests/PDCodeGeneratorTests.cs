@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using PDCodeGeneration;
 
-namespace Tests.PDCodeGeneratorTests
+namespace Tests
 {
     public class PDCodeGeneratorTests
     {
