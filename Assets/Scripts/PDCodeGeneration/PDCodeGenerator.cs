@@ -6,7 +6,7 @@ namespace PDCodeGeneration
     public class PDCodeGenerator
     {
         private readonly ILinkBeadsProvider _beadsProvider;
-        private List<Component> _componentList;
+        private List<PDCodeComponent> _componentList;
 
         public PDCodeGenerator(ILinkBeadsProvider provider)
         {
@@ -16,16 +16,15 @@ namespace PDCodeGeneration
         private void SetComponentList(ILinkBeadsProvider provider)
         {
             var beadsList = provider.GetBeadsList();
-            var componentList = new List<Component>();
+            var componentList = new List<PDCodeComponent>();
 
             for (int componentIndex = 0; componentIndex < beadsList.Count; componentIndex++)
             {
-                componentList.Add(
-                    new Component(
-                        beadsList[componentIndex].Select(beadVector => new Bead(beadVector)).ToList(),
-                        componentIndex
-                    )
+                var genericComponent = new Component(
+                    beadsList[componentIndex].Select(beadVector => new Bead(beadVector)).ToList()
                 );
+                
+                componentList.Add(new PDCodeComponent(genericComponent, componentIndex));
             }
 
             _componentList = componentList;
@@ -61,7 +60,7 @@ namespace PDCodeGeneration
             int initialStrandNumber = 1;
             foreach (var component in _componentList)
             {
-                var exceptionList = new List<Component>() {component};
+                var exceptionList = new List<PDCodeComponent>() {component};
 
                 component.SetBeadStrands(
                     initialStrandNumber,

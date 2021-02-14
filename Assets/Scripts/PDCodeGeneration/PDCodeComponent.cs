@@ -4,27 +4,22 @@ using UnityEngine;
 
 namespace PDCodeGeneration
 {
-    public class Component
+    public class PDCodeComponent
     {
         public readonly List<PDCodeBeadPair> BeadPairs;
-        public List<PDCodeBead> BeadList;
+        private readonly List<PDCodeBead> _beadList;
 
-        public Component(List<Bead> beadList, int componentIndex)
+        public PDCodeComponent(Component component, int componentIndex)
         {
-            BeadList = GetPDCodeBeads(beadList, componentIndex);
+            _beadList = GetPDCodeBeads(component.BeadList, componentIndex);
             BeadPairs = GetBeadPairs();
-        }
-
-        public int GetNumBeads()
-        {
-            return BeadList.Count;
         }
 
         public int GetMaxStrandNumber()
         {
             int maxStrandNumber = 1;
             
-            foreach (var bead in BeadList)
+            foreach (var bead in _beadList)
             {
                 if (bead.strand > maxStrandNumber)
                 {
@@ -35,7 +30,7 @@ namespace PDCodeGeneration
             return maxStrandNumber;
         }
 
-        public void SetBeadStrands(int initialStrandNumber, List<Component> otherComponents)
+        public void SetBeadStrands(int initialStrandNumber, List<PDCodeComponent> otherComponents)
         {
             var currentStrand = initialStrandNumber;
             var allBeadPairs = new List<PDCodeBeadPair>();
@@ -50,7 +45,7 @@ namespace PDCodeGeneration
 
                 foreach (var otherBeadPair in allBeadPairs)
                 {
-                    if (beadPair.DoesIntersectOtherBeadPair(otherBeadPair, GetNumBeads()))
+                    if (beadPair.DoesIntersectOtherBeadPair(otherBeadPair, _beadList.Count))
                     {
                         currentStrand++;
                         break;
@@ -86,11 +81,11 @@ namespace PDCodeGeneration
         {
             var pdCodeBeadPairList = new List<PDCodeBeadPair>();
 
-            for (int beadIndex = 0; beadIndex < BeadList.Count - 1; beadIndex++)
+            for (int beadIndex = 0; beadIndex < _beadList.Count - 1; beadIndex++)
             {
-                pdCodeBeadPairList.Add(new PDCodeBeadPair(BeadList[beadIndex], BeadList[beadIndex + 1]));
+                pdCodeBeadPairList.Add(new PDCodeBeadPair(_beadList[beadIndex], _beadList[beadIndex + 1]));
             }
-            pdCodeBeadPairList.Add(new PDCodeBeadPair(BeadList[BeadList.Count - 1], BeadList[0]));
+            pdCodeBeadPairList.Add(new PDCodeBeadPair(_beadList[_beadList.Count - 1], _beadList[0]));
 
             return pdCodeBeadPairList;
         }
