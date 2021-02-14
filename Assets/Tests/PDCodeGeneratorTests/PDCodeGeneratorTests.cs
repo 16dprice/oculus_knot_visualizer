@@ -4,7 +4,7 @@ using PDCodeGeneration;
 
 namespace Tests.PDCodeGeneratorTests
 {
-    public class NewTestScript
+    public class PDCodeGeneratorTests
     {
         private readonly struct TestCase
         {
