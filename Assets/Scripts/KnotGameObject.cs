@@ -20,7 +20,7 @@ public class KnotGameObject : MonoBehaviour
 
     void Start()
     {
-        DisplayLink();
+        MeshManipulation.DisplayLink(transform, new LinkStickModel(new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents)), sides, radius);
     }
 
     void Update()
@@ -33,7 +33,7 @@ public class KnotGameObject : MonoBehaviour
             _previousNumComponents != NumComponents
         )
         {
-            DisplayLink();
+            MeshManipulation.DisplayLink(transform, new LinkStickModel(new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents)), sides, radius);
 
             _previousRadius = radius;
             _previousSides = sides;
@@ -41,36 +41,5 @@ public class KnotGameObject : MonoBehaviour
             _previousOrdering = Ordering;
             _previousNumComponents = NumComponents;
         }
-    }
-
-    void DisplayLink()
-    {
-        foreach (Transform child in transform)
-        {
-            Destroy(child.gameObject);
-        }
-        
-        var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
-        var stickModel = new LinkStickModel(beadsProvider);
-
-        var knotMeshObjects = stickModel.GetKnotMeshObjects(sides, radius);
-
-        foreach (var meshObject in knotMeshObjects)
-        {
-            if (meshObject != null)
-            {
-                meshObject.transform.parent = transform;
-                ResetTransform(meshObject);
-                
-                meshObject.name = CrossingNumber + "_" + Ordering + "_" + NumComponents;
-            }
-        }
-    }
-
-    void ResetTransform(GameObject obj)
-    {
-        obj.transform.localPosition = Vector3.zero;
-        obj.transform.rotation = Quaternion.identity;
-        obj.transform.localScale = Vector3.one;
     }
 }

@@ -42,7 +42,7 @@ public class DrawBeadSpawner : MonoBehaviour
                 component.Clear();
                 
                 DestroyBeads();
-                DisplayLink();
+                MeshManipulation.DisplayLink(transform, new LinkStickModel(new DrawBeadsProvider(link)), sides, radius);
             }
         }
 
@@ -66,34 +66,6 @@ public class DrawBeadSpawner : MonoBehaviour
         _previousTriggerState = _currentTriggerState;
     }
     
-    void DisplayLink()
-    {
-        foreach (Transform child in transform)
-        {
-            Destroy(child.gameObject);
-        }
-        
-        var stickModel = new LinkStickModel(new DrawBeadsProvider(link));
-
-        var knotMeshObjects = stickModel.GetKnotMeshObjects(sides, radius);
-
-        foreach (var meshObject in knotMeshObjects)
-        {
-            if (meshObject != null)
-            {
-                meshObject.transform.parent = transform;
-                ResetTransform(meshObject);
-            }
-        }
-    }
-
-    void ResetTransform(GameObject obj)
-    {
-        obj.transform.localPosition = Vector3.zero;
-        obj.transform.rotation = Quaternion.identity;
-        obj.transform.localScale = Vector3.one;
-    }
-
     void DestroyBeads()
     {
         foreach (var beadPrefabObject in _beadPrefabObjects)
