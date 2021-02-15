@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using UnityEngine;
 
 public class KnotGameObject : MonoBehaviour
@@ -6,10 +6,9 @@ public class KnotGameObject : MonoBehaviour
     [SerializeField] float radius = 0.5f;
     [SerializeField] int sides = 6;
     
-    //PR: name these starting with capitals since they're public class vars (i.e. public int NumComponents)
-    public int numComponents {get; set;} = 1;
-    public int crossingNumber {get; set;} = 3;
-    public int ordering {get; set;} = 1;
+    public int NumComponents {get; set;} = 1;
+    public int CrossingNumber {get; set;} = 3;
+    public int Ordering {get; set;} = 1;
 
     private float _previousRadius = 0.5f;
     private int _previousSides = 6;
@@ -29,30 +28,29 @@ public class KnotGameObject : MonoBehaviour
         if (
             Math.Abs(_previousRadius - radius) > 0.1 ||
             _previousSides != sides ||
-            _previousCrossingNumber != crossingNumber ||
-            _previousOrdering != ordering ||
-            _previousNumComponents != numComponents
+            _previousCrossingNumber != CrossingNumber ||
+            _previousOrdering != Ordering ||
+            _previousNumComponents != NumComponents
         )
         {
-            //PR: unnecessary "this"
-            foreach (Transform child in this.transform)
-            {
-                Destroy(child.gameObject);
-            }
-
             DisplayLink();
 
             _previousRadius = radius;
             _previousSides = sides;
-            _previousCrossingNumber = crossingNumber;
-            _previousOrdering = ordering;
-            _previousNumComponents = numComponents;
+            _previousCrossingNumber = CrossingNumber;
+            _previousOrdering = Ordering;
+            _previousNumComponents = NumComponents;
         }
     }
 
     void DisplayLink()
     {
-        var beadsProvider = new DefaultFileBeadsProvider(crossingNumber, ordering, numComponents);
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+        
+        var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
         var stickModel = new LinkStickModel(beadsProvider);
 
         var knotMeshObjects = stickModel.GetKnotMeshObjects(sides, radius);
@@ -64,7 +62,7 @@ public class KnotGameObject : MonoBehaviour
                 meshObject.transform.parent = transform;
                 ResetTransform(meshObject);
                 
-                meshObject.name = crossingNumber + "_" + ordering + "_" + numComponents;
+                meshObject.name = CrossingNumber + "_" + Ordering + "_" + NumComponents;
             }
         }
     }
