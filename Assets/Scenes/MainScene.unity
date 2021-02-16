@@ -963,6 +963,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 0.5
   sides: 6
+  crossingNumber: 3
+  ordering: 1
+  numComponents: 3
 --- !u!4 &1652341247
 Transform:
   m_ObjectHideFlags: 0
