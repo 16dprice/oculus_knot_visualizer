@@ -2,7 +2,7 @@
 
 public class ButtonKnotIncrementor : MonoBehaviour
 {
-    KnotGameObject knotGameObject;
+    KnotGameObject _knotGameObject;
     int _numComponents;
     int _crossingNumber;
     int _ordering;
@@ -17,14 +17,14 @@ public class ButtonKnotIncrementor : MonoBehaviour
 
     void Start()
     {
-        knotGameObject = GameObject.Find("KnotGameObject").GetComponent<KnotGameObject>();
+        _knotGameObject = GameObject.Find("KnotGameObject").GetComponent<KnotGameObject>();
     }
 
     void NextKnot()
     {
-        _numComponents = knotGameObject.NumComponents;
-        _crossingNumber = knotGameObject.CrossingNumber;
-        _ordering = knotGameObject.Ordering;
+        _numComponents = _knotGameObject.NumComponents;
+        _crossingNumber = _knotGameObject.CrossingNumber;
+        _ordering = _knotGameObject.Ordering;
         
         for ( ; _numComponents < _numberOfLinks.Length; _numComponents++)
         {
@@ -33,9 +33,9 @@ public class ButtonKnotIncrementor : MonoBehaviour
                 if (_ordering < _numberOfLinks[_numComponents][_crossingNumber]) {
                     _ordering++;
 
-                    knotGameObject.NumComponents = _numComponents;
-                    knotGameObject.CrossingNumber = _crossingNumber;
-                    knotGameObject.Ordering = _ordering;
+                    _knotGameObject.NumComponents = _numComponents;
+                    _knotGameObject.CrossingNumber = _crossingNumber;
+                    _knotGameObject.Ordering = _ordering;
 
                     return;
                 }
@@ -46,9 +46,9 @@ public class ButtonKnotIncrementor : MonoBehaviour
             _crossingNumber = 0;
         }
         
-        knotGameObject.NumComponents = 1;
-        knotGameObject.CrossingNumber = 3;
-        knotGameObject.Ordering = 1;
+        _knotGameObject.NumComponents = 1;
+        _knotGameObject.CrossingNumber = 3;
+        _knotGameObject.Ordering = 1;
     }
     
 }
