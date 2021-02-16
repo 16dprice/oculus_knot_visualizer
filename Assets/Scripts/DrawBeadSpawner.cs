@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class DrawBeadSpawner : MonoBehaviour
 {
-    float radius = 0.02f;
-    int sides = 6;
+    private readonly float _radius = 0.02f;
+    private readonly int _sides = 6;
     
-    [SerializeField] private GameObject _beadPrefab;
-    private List<GameObject> _beadPrefabObjects = new List<GameObject>();
+    [SerializeField] private GameObject beadPrefab;
+    private readonly List<GameObject> _beadPrefabObjects = new List<GameObject>();
     
-    private List<Vector3> component = new List<Vector3>();
-    private List<Vector3[]> link = new List<Vector3[]>();
+    private readonly List<Vector3> _component = new List<Vector3>();
+    private readonly List<Vector3[]> _link = new List<Vector3[]>();
 
     private bool _previousTriggerState = false;
     private bool _currentTriggerState = false;
@@ -19,7 +20,7 @@ public class DrawBeadSpawner : MonoBehaviour
     private Vector3 _previousTouchPos = Vector3.zero;
     private Vector3 _currentTouchPos = Vector3.zero;
 
-    void Update()
+    private void Update()
     {
         _currentTriggerState = OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger);
         _currentTouchPos = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
@@ -38,11 +39,11 @@ public class DrawBeadSpawner : MonoBehaviour
             
             if (!_previousTriggerState)
             {
-                link.Add(component.ToArray());
-                component.Clear();
+                _link.Add(_component.ToArray());
+                _component.Clear();
                 
                 DestroyBeads();
-                MeshManipulation.DisplayLink(transform, new LinkStickModel(new DrawBeadsProvider(link)), sides, radius);
+                MeshManipulation.DisplayLink(transform, new LinkStickModel(new DrawBeadsProvider(_link)), _sides, _radius);
             }
         }
 
@@ -52,9 +53,9 @@ public class DrawBeadSpawner : MonoBehaviour
             //Avoids square root calculation
             if (d.x*d.x + d.y*d.y + d.z*d.z > 0.001f)
             {
-                var bead = Instantiate(_beadPrefab, _currentTouchPos, Quaternion.identity);
+                var bead = Instantiate(beadPrefab, _currentTouchPos, Quaternion.identity);
                 _beadPrefabObjects.Add(bead);
-                component.Add(_currentTouchPos);
+                _component.Add(_currentTouchPos);
                 
                 _previousTouchPos = _currentTouchPos;
             }
@@ -65,8 +66,8 @@ public class DrawBeadSpawner : MonoBehaviour
 
         _previousTriggerState = _currentTriggerState;
     }
-    
-    void DestroyBeads()
+
+    private void DestroyBeads()
     {
         foreach (var beadPrefabObject in _beadPrefabObjects)
         {
@@ -76,13 +77,13 @@ public class DrawBeadSpawner : MonoBehaviour
         _beadPrefabObjects.Clear();
     }
 
-    void DestroyLink()
+    private void DestroyLink()
     {
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
         }
         
-        link.Clear();
+        _link.Clear();
     }
 }

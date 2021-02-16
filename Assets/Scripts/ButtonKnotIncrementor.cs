@@ -2,12 +2,12 @@
 
 public class ButtonKnotIncrementor : MonoBehaviour
 {
-    KnotGameObject _knotGameObject;
-    int _numComponents;
-    int _crossingNumber;
-    int _ordering;
+    private KnotGameObject _knotGameObject;
+    private int _numComponents;
+    private int _crossingNumber;
+    private int _ordering;
 
-    int[][] _numberOfLinks =
+    private readonly int[][] _numberOfLinks =
     {
         new[] {0},
         new[] {0, 0, 0, 1, 1, 2, 3, 7},
