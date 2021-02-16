@@ -3,20 +3,25 @@ using UnityEngine;
 
 public class LinkStickModel
 {
-    private const float PI = 3.1415926535898f;
+    const float PI = 3.1415926535898f;
+    
+    private readonly List<Vector3[]> _beadsList;
 
     private readonly List<Vector3[]> beadsList;
 
     public LinkStickModel(ILinkBeadsProvider beadsProvider)
     {
-        beadsList = beadsProvider.GetBeadsList();
+        _beadsList = beadsProvider.GetBeadsList();
     }
 
     public List<GameObject> GetKnotMeshObjects(int sides, float radius)
     {
         var knotMeshObjects = new List<GameObject>();
 
-        foreach (var knotBeads in beadsList) knotMeshObjects.Add(GetKnotMeshObject(knotBeads, sides, radius));
+        foreach (var knotBeads in _beadsList)
+        {
+            knotMeshObjects.Add(GetKnotMeshObject(knotBeads, sides, radius));
+        }
 
         return knotMeshObjects;
     }
