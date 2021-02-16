@@ -5,18 +5,18 @@ public class LinkStickModel
 {
     const float PI = 3.1415926535898f;
     
-    private List<Vector3[]> beadsList;
+    private readonly List<Vector3[]> _beadsList;
 
     public LinkStickModel(ILinkBeadsProvider beadsProvider)
     {
-        beadsList = beadsProvider.GetBeadsList();
+        _beadsList = beadsProvider.GetBeadsList();
     }
 
     public List<GameObject> GetKnotMeshObjects(int sides, float radius)
     {
         var knotMeshObjects = new List<GameObject>();
 
-        foreach (var knotBeads in beadsList)
+        foreach (var knotBeads in _beadsList)
         {
             knotMeshObjects.Add(GetKnotMeshObject(knotBeads, sides, radius));
         }
