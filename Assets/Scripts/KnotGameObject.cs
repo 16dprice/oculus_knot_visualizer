@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 
 public class KnotGameObject : MonoBehaviour
@@ -14,8 +14,8 @@ public class KnotGameObject : MonoBehaviour
     private int _previousSides = 6;
     
     private int _previousCrossingNumber = 3;
-    private int _previousOrdering = 1;
     private int _previousNumComponents = 1;
+    private int _previousOrdering = 1;
 
 
     void Start()
@@ -23,7 +23,7 @@ public class KnotGameObject : MonoBehaviour
         MeshManipulation.DisplayLink(transform, new LinkStickModel(new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents)), sides, radius);
     }
 
-    void Update()
+    private void Update()
     {
         if (
             Math.Abs(_previousRadius - radius) > 0.1 ||

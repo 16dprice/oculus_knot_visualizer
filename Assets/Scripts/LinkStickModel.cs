@@ -7,6 +7,8 @@ public class LinkStickModel
     
     private readonly List<Vector3[]> _beadsList;
 
+    private readonly List<Vector3[]> beadsList;
+
     public LinkStickModel(ILinkBeadsProvider beadsProvider)
     {
         _beadsList = beadsProvider.GetBeadsList();
@@ -35,9 +37,9 @@ public class LinkStickModel
         var meshRenderer = newKnot.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
 
         var mesh = new Mesh();
-        
+
         mesh.vertices = GetVertices(beads, sides, radius);
-        mesh.triangles = GetTriangles(beads, sides);;
+        mesh.triangles = GetTriangles(beads, sides);
         mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh; //assign the mesh
@@ -46,9 +48,9 @@ public class LinkStickModel
         return newKnot;
     }
 
-    Vector3[] GetVertices(Vector3[] beads, int sides, float radius)
+    private Vector3[] GetVertices(Vector3[] beads, int sides, float radius)
     {
-        Vector3[] vertices = new Vector3[beads.Length * sides];
+        var vertices = new Vector3[beads.Length * sides];
 
         //Define an n-gon by points on the xy plane then scale it to radius
         var ngon = GenerateNGonPoints(sides, radius);
@@ -56,31 +58,35 @@ public class LinkStickModel
 
         //first few vertices around the bead
         var ngonRotation = Quaternion.FromToRotation(ngonNormal, beads[1] - beads[beads.Length - 1]);
-        for (int j = 0; j < sides; j++)
+        for (var j = 0; j < sides; j++)
             vertices[j] = ngonRotation * ngon[j] + beads[0];
 
         //Generate remaining vertices
-        for (int i = 1; i < beads.Length - 1; i++)
+        for (var i = 1; i < beads.Length - 1; i++)
         {
             /*Rotate the ngon such that the normal is parallel to the
              * line drawn between the two beads surrounding the bead beads[i] */
-            ngonRotation = Quaternion.FromToRotation(ngonNormal, beads[i + 1] - beads[i - 1]); //Somehow this rotation looks a lot better than I was expecting... thanks quaternions!
+            ngonRotation =
+                Quaternion.FromToRotation(ngonNormal,
+                    beads[i + 1] -
+                    beads[i - 1]); //Somehow this rotation looks a lot better than I was expecting... thanks quaternions!
 
-            for (int j = 0; j < sides; j++)
+            for (var j = 0; j < sides; j++)
                 vertices[sides * i + j] = ngonRotation * ngon[j] + beads[i];
         }
+
         //last case
         ngonRotation = Quaternion.FromToRotation(ngonNormal, beads[0] - beads[beads.Length - 2]);
-        for (int j = 0; j < sides; j++)
+        for (var j = 0; j < sides; j++)
             vertices[sides * (beads.Length - 1) + j] = ngonRotation * ngon[j] + beads[beads.Length - 1];
 
         return vertices;
     }
-    
-    List<Vector3> GenerateNGonPoints(int n, float radius)
+
+    private List<Vector3> GenerateNGonPoints(int n, float radius)
     {
-        List<Vector3> points = new List<Vector3>();
-        
+        var points = new List<Vector3>();
+
         //Don't forget the scale by radius
         for (float i = 0; i < Mathf.Abs(n); i++)
             points.Add(new Vector3(Mathf.Cos(i / n * 2 * PI), Mathf.Sin(i / n * 2 * PI), 0.0f) * radius);
@@ -88,15 +94,15 @@ public class LinkStickModel
         return points;
     }
 
-    int[] GetTriangles(Vector3[] beads, int sides)
+    private int[] GetTriangles(Vector3[] beads, int sides)
     {
         var triangles = new int[beads.Length * 6 * sides];
         int p, passed;
-        
-        for (int i = 0; i < beads.Length - 1; i++)
+
+        for (var i = 0; i < beads.Length - 1; i++)
         {
             p = 6 * sides * i;
-            for (int j = 0; j < sides - 1; j++)
+            for (var j = 0; j < sides - 1; j++)
             {
                 passed = p + 6 * j;
                 triangles[passed + 0] = sides * i + j;
@@ -106,6 +112,7 @@ public class LinkStickModel
                 triangles[passed + 4] = sides * (i + 1) + j;
                 triangles[passed + 5] = sides * (i + 1) + j + 1;
             }
+
             //last side
             p += 6 * sides;
             triangles[p - 6] = sides * i + sides - 1;
@@ -115,9 +122,10 @@ public class LinkStickModel
             triangles[p - 2] = sides * (i + 1) + sides - 1;
             triangles[p - 1] = sides * (i + 1);
         }
+
         //last segment
         p = 6 * sides * (beads.Length - 1);
-        for (int j = 0; j < sides - 1; j++)
+        for (var j = 0; j < sides - 1; j++)
         {
             passed = p + 6 * j;
             triangles[passed + 0] = sides * (beads.Length - 1) + j;
