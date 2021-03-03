@@ -40,7 +40,6 @@ public class LinkStickModel
 
         mesh.vertices = GetVertices(beads, sides, radius);
         mesh.triangles = GetTriangles(beads, sides);
-        ;
         mesh.RecalculateNormals();
 
         meshFilter.mesh = mesh; //assign the mesh
