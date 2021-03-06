@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using BeadsProviders;
+using Domain;
 
 namespace PDCodeGeneration
 {

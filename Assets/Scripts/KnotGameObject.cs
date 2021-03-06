@@ -1,4 +1,6 @@
 using System;
+using BeadsProviders;
+using UI;
 using UnityEngine;
 
 public class KnotGameObject : MonoBehaviour
@@ -20,7 +22,10 @@ public class KnotGameObject : MonoBehaviour
 
     void Start()
     {
-        MeshManipulation.DisplayLink(transform, new LinkStickModel(new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents)), sides, radius);
+        var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
+        var linkStickModel = new LinkStickModel(beadsProvider);
+        
+        MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
     }
 
     private void Update()
@@ -33,7 +38,10 @@ public class KnotGameObject : MonoBehaviour
             _previousNumComponents != NumComponents
         )
         {
-            MeshManipulation.DisplayLink(transform, new LinkStickModel(new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents)), sides, radius);
+            var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
+            var linkStickModel = new LinkStickModel(beadsProvider);
+            
+            MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
 
             _previousRadius = radius;
             _previousSides = sides;
