@@ -3,10 +3,6 @@ using System.IO;
 using LinkRelaxing;
 using NUnit.Framework;
 using UnityEngine;
-using Debug = System.Diagnostics.Debug;
-
-// pt1 = {1, 2, 1}; pt2 = {-1, -1, -1};
-// pt3 = {-1, -1, 3}; pt4 = {2, 1, -1};
 
 namespace Tests
 {
@@ -29,9 +25,10 @@ namespace Tests
         }
         
         private const float TOL = 0.0001f;
+        private readonly string _testFilePath = Path.Combine("TestFiles", "SegmentDistanceCalculatorTestCases");
         
         [Test]
-        public void TestGetPDListCount()
+        public void TestSegmentDistance()
         {
             foreach(var testCase in GetTestCases().cases)
             {
@@ -44,11 +41,9 @@ namespace Tests
             }
         }
 
-        private static TestCases GetTestCases()
+        private TestCases GetTestCases()
         {
-            var filePath = Path.Combine("TestFiles", "SegmentDistanceCalculatorTestCases");
-
-            var jsonFile = Resources.Load(filePath) as TextAsset;
+            var jsonFile = Resources.Load(_testFilePath) as TextAsset;
             var cases = JsonUtility.FromJson<TestCases>(jsonFile.text);
 
             return cases;

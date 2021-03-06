@@ -1,8 +1,7 @@
 ﻿{
     "name": "Tests",
     "references": [
-        "Scripts",
-        "Resources"
+        "Scripts"
     ],
     "optionalUnityReferences": [
         "TestAssemblies"
