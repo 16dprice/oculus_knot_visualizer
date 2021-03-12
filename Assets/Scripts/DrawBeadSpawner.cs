@@ -19,11 +19,18 @@ public class DrawBeadSpawner : MonoBehaviour
     
     private Vector3 _previousTouchPos = Vector3.zero;
     private Vector3 _currentTouchPos = Vector3.zero;
+    
+    [SerializeField] private Transform _indexFingerTransform;
+    [SerializeField] private Transform _thumbFingerTransform;
+    [SerializeField] private Transform _middleFingerTransform;
 
     private void Update()
     {
-        _currentTriggerState = OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger);
-        _currentTouchPos = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
+        _currentTouchPos = _indexFingerTransform.position;
+        _currentTriggerState = (Vector3.Distance(_currentTouchPos,_thumbFingerTransform.position) < 0.02);
+        
+        //_currentTriggerState = OVRInput.Get(OVRInput.Button.SecondaryIndexTrigger);
+        //_currentTouchPos = OVRInput.GetLocalControllerPosition(OVRInput.Controller.RTouch);
 
         if (_currentTriggerState)
         {
@@ -61,8 +68,11 @@ public class DrawBeadSpawner : MonoBehaviour
             }
         }
 
-        if (OVRInput.GetDown(OVRInput.Button.Two))
+        if (Vector3.Distance(_middleFingerTransform.position, _thumbFingerTransform.position) < 0.02)
             DestroyLink();
+        
+        //if (OVRInput.GetDown(OVRInput.Button.Two))
+        //    DestroyLink();
 
         _previousTriggerState = _currentTriggerState;
     }
