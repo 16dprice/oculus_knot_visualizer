@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BeadsProviders;
+using Domain;
 using UnityEngine;
 
 namespace UI
@@ -8,29 +9,28 @@ namespace UI
     {
         const float PI = 3.1415926535898f;
     
-        private readonly List<Vector3[]> _beadsList;
+        private readonly List<LinkComponent> _componentList;
 
         public LinkStickModel(ILinkBeadsProvider beadsProvider)
         {
-            _beadsList = beadsProvider.GetBeadsList();
+            _componentList = beadsProvider.GetLinkComponents();
         }
 
         public List<GameObject> GetKnotMeshObjects(int sides, float radius)
         {
             var knotMeshObjects = new List<GameObject>();
 
-            foreach (var knotBeads in _beadsList)
+            foreach (var linkComponent in _componentList)
             {
-                knotMeshObjects.Add(GetKnotMeshObject(knotBeads, sides, radius));
+                knotMeshObjects.Add(GetKnotMeshObject(linkComponent.BeadList, sides, radius));
             }
 
             return knotMeshObjects;
         }
 
-        private GameObject GetKnotMeshObject(Vector3[] beads, int sides, float radius)
+        private GameObject GetKnotMeshObject(List<Bead> beads, int sides, float radius)
         {
-            if (beads.Length < 3) return null;
-
+            if (beads.Count < 3) return null;
 
             var newKnot = new GameObject();
 
@@ -49,37 +49,37 @@ namespace UI
             return newKnot;
         }
 
-        private Vector3[] GetVertices(Vector3[] beads, int sides, float radius)
+        private Vector3[] GetVertices(List<Bead> beads, int sides, float radius)
         {
-            var vertices = new Vector3[beads.Length * sides];
+            var vertices = new Vector3[beads.Count * sides];
 
             //Define an n-gon by points on the xy plane then scale it to radius
             var ngon = GenerateNGonPoints(sides, radius);
             var ngonNormal = Vector3.back;
 
             //first few vertices around the bead
-            var ngonRotation = Quaternion.FromToRotation(ngonNormal, beads[1] - beads[beads.Length - 1]);
+            var ngonRotation = Quaternion.FromToRotation(ngonNormal, beads[1].position - beads[beads.Count - 1].position);
             for (var j = 0; j < sides; j++)
-                vertices[j] = ngonRotation * ngon[j] + beads[0];
+                vertices[j] = ngonRotation * ngon[j] + beads[0].position;
 
             //Generate remaining vertices
-            for (var i = 1; i < beads.Length - 1; i++)
+            for (var i = 1; i < beads.Count - 1; i++)
             {
                 /*Rotate the ngon such that the normal is parallel to the
              * line drawn between the two beads surrounding the bead beads[i] */
                 ngonRotation =
                     Quaternion.FromToRotation(ngonNormal,
-                        beads[i + 1] -
-                        beads[i - 1]); //Somehow this rotation looks a lot better than I was expecting... thanks quaternions!
+                        beads[i + 1].position -
+                        beads[i - 1].position); //Somehow this rotation looks a lot better than I was expecting... thanks quaternions!
 
                 for (var j = 0; j < sides; j++)
-                    vertices[sides * i + j] = ngonRotation * ngon[j] + beads[i];
+                    vertices[sides * i + j] = ngonRotation * ngon[j] + beads[i].position;
             }
 
             //last case
-            ngonRotation = Quaternion.FromToRotation(ngonNormal, beads[0] - beads[beads.Length - 2]);
+            ngonRotation = Quaternion.FromToRotation(ngonNormal, beads[0].position - beads[beads.Count - 2].position);
             for (var j = 0; j < sides; j++)
-                vertices[sides * (beads.Length - 1) + j] = ngonRotation * ngon[j] + beads[beads.Length - 1];
+                vertices[sides * (beads.Count - 1) + j] = ngonRotation * ngon[j] + beads[beads.Count - 1].position;
 
             return vertices;
         }
@@ -95,12 +95,12 @@ namespace UI
             return points;
         }
 
-        private int[] GetTriangles(Vector3[] beads, int sides)
+        private int[] GetTriangles(List<Bead> beads, int sides)
         {
-            var triangles = new int[beads.Length * 6 * sides];
+            var triangles = new int[beads.Count * 6 * sides];
             int p, passed;
 
-            for (var i = 0; i < beads.Length - 1; i++)
+            for (var i = 0; i < beads.Count - 1; i++)
             {
                 p = 6 * sides * i;
                 for (var j = 0; j < sides - 1; j++)
@@ -125,23 +125,23 @@ namespace UI
             }
 
             //last segment
-            p = 6 * sides * (beads.Length - 1);
+            p = 6 * sides * (beads.Count - 1);
             for (var j = 0; j < sides - 1; j++)
             {
                 passed = p + 6 * j;
-                triangles[passed + 0] = sides * (beads.Length - 1) + j;
+                triangles[passed + 0] = sides * (beads.Count - 1) + j;
                 triangles[passed + 1] = j;
-                triangles[passed + 2] = sides * (beads.Length - 1) + j + 1;
-                triangles[passed + 3] = sides * (beads.Length - 1) + j + 1;
+                triangles[passed + 2] = sides * (beads.Count - 1) + j + 1;
+                triangles[passed + 3] = sides * (beads.Count - 1) + j + 1;
                 triangles[passed + 4] = j;
                 triangles[passed + 5] = j + 1;
             }
 
             p += 6 * sides;
-            triangles[p - 6] = sides * (beads.Length - 1) + sides - 1;
+            triangles[p - 6] = sides * (beads.Count - 1) + sides - 1;
             triangles[p - 5] = sides - 1;
-            triangles[p - 4] = sides * (beads.Length - 1);
-            triangles[p - 3] = sides * (beads.Length - 1);
+            triangles[p - 4] = sides * (beads.Count - 1);
+            triangles[p - 3] = sides * (beads.Count - 1);
             triangles[p - 2] = sides - 1;
             triangles[p - 1] = 0;
 

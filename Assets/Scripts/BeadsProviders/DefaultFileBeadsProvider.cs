@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Domain;
 using FileAccess;
 using UnityEngine;
 
@@ -14,10 +15,10 @@ namespace BeadsProviders
             _linkPointsTextFile = DefaultFileAccessor.GetTextAsset(crossingNumber, ordering, numComponents);
         }
 
-        public List<Vector3[]> GetBeadsList()
+        public List<LinkComponent> GetLinkComponents()
         {
-            var componentPoints = new List<Vector3>();
-            var linkList = new List<Vector3[]>();
+            var componentBeads = new List<Bead>();
+            var linkList = new List<LinkComponent>();
 
             var linkTextFileText = _linkPointsTextFile.text;
             var points = linkTextFileText.Split(Environment.NewLine.ToCharArray());
@@ -26,12 +27,12 @@ namespace BeadsProviders
             {
                 var point = ParseTextFileLineIntoVector(line);
 
-                if (point != null) componentPoints.Add(point.Value);
+                if (point != null) componentBeads.Add(new Bead(point.Value));
 
                 if (string.IsNullOrWhiteSpace(line))
                 {
-                    linkList.Add(componentPoints.ToArray());
-                    componentPoints = new List<Vector3>();
+                    linkList.Add(new LinkComponent(componentBeads));
+                    componentBeads = new List<Bead>();
                 }
             }
 
