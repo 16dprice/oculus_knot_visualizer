@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
+using Domain;
 
 namespace BeadsProviders
 {
     public interface ILinkBeadsProvider
     {
-        List<Vector3[]> GetBeadsList();
+        List<LinkComponent> GetLinkComponents();
     }
 }

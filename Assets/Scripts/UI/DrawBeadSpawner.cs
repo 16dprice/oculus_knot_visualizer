@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using BeadsProviders;
+using Domain;
 using UnityEngine;
 
 namespace UI
@@ -12,8 +13,8 @@ namespace UI
         [SerializeField] private GameObject beadPrefab;
         private readonly List<GameObject> _beadPrefabObjects = new List<GameObject>();
     
-        private readonly List<Vector3> _component = new List<Vector3>();
-        private readonly List<Vector3[]> _link = new List<Vector3[]>();
+        private readonly List<Bead> _component = new List<Bead>();
+        private readonly List<LinkComponent> _link = new List<LinkComponent>();
 
         private bool _previousTriggerState = false;
         private bool _currentTriggerState = false;
@@ -41,7 +42,7 @@ namespace UI
             
                 if (!_previousTriggerState)
                 {
-                    _link.Add(_component.ToArray());
+                    _link.Add(new LinkComponent(_component));
                     _component.Clear();
                 
                     DestroyBeads();
@@ -57,7 +58,7 @@ namespace UI
                 {
                     var bead = Instantiate(beadPrefab, _currentTouchPos, Quaternion.identity);
                     _beadPrefabObjects.Add(bead);
-                    _component.Add(_currentTouchPos);
+                    _component.Add(new Bead(_currentTouchPos));
                 
                     _previousTouchPos = _currentTouchPos;
                 }

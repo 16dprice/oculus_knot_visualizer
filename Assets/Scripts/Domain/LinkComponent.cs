@@ -2,11 +2,11 @@ using System.Collections.Generic;
 
 namespace Domain
 {
-    public class Component
+    public class LinkComponent
     {
         public readonly List<Bead> BeadList;
 
-        public Component(List<Bead> beadList)
+        public LinkComponent(List<Bead> beadList)
         {
             BeadList = beadList;
         }
