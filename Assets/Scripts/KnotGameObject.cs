@@ -11,7 +11,9 @@ public class KnotGameObject : MonoBehaviour
     [SerializeField] float radius = 0.5f;
     [SerializeField] int sides = 6;
     [SerializeField] bool minimize = false;
-    
+    [SerializeField] float H = 0.9f;
+    [SerializeField] float K = 0.01f;
+
     public int NumComponents {get; set;} = 1;
     public int CrossingNumber {get; set;} = 8;
     public int Ordering {get; set;} = 22;
@@ -25,7 +27,7 @@ public class KnotGameObject : MonoBehaviour
 
     private LinkStickModel linkStickModel;
     private List<LinkComponent> linkComponents;
-    
+
     void Start()
     {
         // var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
@@ -41,7 +43,7 @@ public class KnotGameObject : MonoBehaviour
 
     private void Update()
     {
-        linkComponents = LinkRelaxer.SimplifyLink(linkComponents, 1, 0.01f, 1.5f, 3);
+        linkComponents = LinkRelaxer.SimplifyLink(linkComponents, H, K, 4, 1);
         linkStickModel = new LinkStickModel(linkComponents);
     
         MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
