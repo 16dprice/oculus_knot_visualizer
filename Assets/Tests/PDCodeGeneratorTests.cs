@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using BeadsProviders;
 using NUnit.Framework;
 using PDCodeGeneration;
 
