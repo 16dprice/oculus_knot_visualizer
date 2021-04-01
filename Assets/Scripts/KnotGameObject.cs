@@ -25,8 +25,9 @@ public class KnotGameObject : MonoBehaviour
     private int _previousNumComponents = 1;
     private int _previousOrdering = 1;
 
-    private LinkStickModel linkStickModel;
-    private List<LinkComponent> linkComponents;
+    private LinkStickModel _linkStickModel;
+    private List<LinkComponent> _linkComponents;
+    private LinkRelaxer _linkRelaxer;
 
     void Start()
     {
@@ -35,18 +36,22 @@ public class KnotGameObject : MonoBehaviour
         //
         // MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
         var beadsProvider = new DefaultFileBeadsProvider(8, 22, 1);
-        linkComponents = beadsProvider.GetLinkComponents();
-        linkStickModel = new LinkStickModel(linkComponents);
+        _linkComponents = beadsProvider.GetLinkComponents();
+        // _linkStickModel = new LinkStickModel(linkComponents);
+        _linkRelaxer = new LinkRelaxer(_linkComponents);
         
-        MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
+        MeshManipulation.DisplayLink(transform, _linkStickModel, sides, radius);
     }
 
     private void Update()
     {
-        linkComponents = LinkRelaxer.SimplifyLink(linkComponents, H, K, 4, 1);
-        linkStickModel = new LinkStickModel(linkComponents);
-    
-        MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
+        if (minimize)
+        {
+            _linkComponents = _linkRelaxer.SimplifyLink(H, K, 4, 1);
+            _linkStickModel = new LinkStickModel(_linkComponents);
+
+            MeshManipulation.DisplayLink(transform, _linkStickModel, sides, radius);
+        }
     }
 
     // private void Update()

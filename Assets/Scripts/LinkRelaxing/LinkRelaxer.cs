@@ -8,30 +8,30 @@ namespace LinkRelaxing
     public class LinkRelaxer
     {
         // D_MAX must be less than D_CLOSE
-        private static float D_MAX = 1f;
-        private static float D_CLOSE = 2f;
-
-        public static List<LinkComponent> SimplifyLink(
-            List<LinkComponent> linkComponents,
-            float H,
-            float K,
-            float alpha,
-            float beta
-        )
+        private static float D_MAX = 0.1f;
+        private static float D_CLOSE = 0.15f;
+        
+        private List<LinkRelaxingBead> _linkRelaxingBeads;
+        
+        public LinkRelaxer(List<LinkComponent> linkComponents)
         {
-            var linkRelaxingBeads = GetLinkRelaxingBeads(linkComponents);
-            var forces = CalculateForces(linkRelaxingBeads, H, K, alpha, beta);
+            _linkRelaxingBeads = GetLinkRelaxingBeads(linkComponents);
+        }
+
+        public List<LinkComponent> SimplifyLink(float H, float K, float alpha, float beta)
+        {
+            var forces = CalculateForces(_linkRelaxingBeads, H, K, alpha, beta);
 
             var beadList = new List<Bead>();
             for (int i = 0; i < forces.Count; i++)
             {
-                linkRelaxingBeads[i].bead.position += forces[i];
-                if (!IsBeadSafeToMove(linkRelaxingBeads, i))
+                _linkRelaxingBeads[i].bead.position += forces[i];
+                if (!IsBeadSafeToMove(_linkRelaxingBeads, i))
                 {
-                    linkRelaxingBeads[i].bead.position -= forces[i];
+                    _linkRelaxingBeads[i].bead.position -= forces[i];
                 }
 
-                beadList.Add(linkRelaxingBeads[i].bead);
+                beadList.Add(_linkRelaxingBeads[i].bead);
             }
 
             var linkComponent = new LinkComponent(beadList);
@@ -160,9 +160,6 @@ namespace LinkRelaxing
             var currentBeadSegments = GetCurrentBeadSegments(linkRelaxingBeads, currentBeadIndex);
             var nonAdjacentBeadSegments = GetNonAdjacentBeadSegments(linkRelaxingBeads, currentBeadSegments);
 
-            // Debug.Log(currentBeadSegments.Count);
-            // Debug.Log(nonAdjacentBeadSegments.Count);
-
             foreach (var currentBeadSegment in currentBeadSegments)
             {
                 foreach (var nonAdjacentBeadSegment in nonAdjacentBeadSegments)
@@ -170,12 +167,8 @@ namespace LinkRelaxing
                     var segmentDistance =
                         SegmentDistanceCalculator.SegmentDistance(currentBeadSegment, nonAdjacentBeadSegment);
 
-                    // Debug.Log(segmentDistance);
-
                     if (segmentDistance < D_CLOSE)
                     {
-                        // Debug.Log(segmentDistance);
-                        // Debug.Log(D_CLOSE);
                         return false;
                     }
                 }
