@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Domain;
 using UnityEngine;
 
@@ -10,12 +11,63 @@ namespace LinkRelaxing
         // D_MAX must be less than D_CLOSE
         private static float D_MAX = 0.1f;
         private static float D_CLOSE = 0.15f;
-        
+
         private List<LinkRelaxingBead> _linkRelaxingBeads;
-        
+        private List<(LinkRelaxingBead, (LinkRelaxingBead, LinkRelaxingBead))> _adjacentBeads;
+        private List<(LinkRelaxingBead, List<LinkRelaxingBead>)> _nonAdjacentBeads;
+
         public LinkRelaxer(List<LinkComponent> linkComponents)
         {
             _linkRelaxingBeads = GetLinkRelaxingBeads(linkComponents);
+            _adjacentBeads = GetAdjacentBeads();
+            _nonAdjacentBeads = GetNonAdjacentBeads();
+        }
+
+        private List<(LinkRelaxingBead, (LinkRelaxingBead, LinkRelaxingBead))> GetAdjacentBeads()
+        {
+            var adjacentBeadList = new List<(LinkRelaxingBead, (LinkRelaxingBead, LinkRelaxingBead))>();
+
+            foreach (var firstBead in _linkRelaxingBeads)
+            {
+                var beadsAdjacentToFirstBead =
+                    _linkRelaxingBeads.Where(secondBead => firstBead.IsBeadAdjacent(secondBead)).ToList();
+                
+                var adjacentBeadsTuple = (
+                    beadsAdjacentToFirstBead[0],
+                    beadsAdjacentToFirstBead[1]
+                );
+
+                var beadListItem = (firstBead, adjacentBeadsTuple);
+
+                adjacentBeadList.Add(beadListItem);
+            }
+
+            return adjacentBeadList;
+        }
+
+        private List<(LinkRelaxingBead, List<LinkRelaxingBead>)> GetNonAdjacentBeads()
+        {
+            var nonAdjacentBeadList = new List<(LinkRelaxingBead, List<LinkRelaxingBead>)>();
+
+            for (var firstBeadIndex = 0; firstBeadIndex < _linkRelaxingBeads.Count; firstBeadIndex++)
+            {
+                var firstBead = _linkRelaxingBeads[firstBeadIndex];
+                var beadsNonAdjacentToFirstBead = new List<LinkRelaxingBead>();
+
+                for (var secondBeadIndex = 0; secondBeadIndex < _linkRelaxingBeads.Count; secondBeadIndex++)
+                {
+                    if (secondBeadIndex == firstBeadIndex) continue;
+                    if (firstBead.IsBeadAdjacent(_linkRelaxingBeads[secondBeadIndex])) continue;
+                    
+                    beadsNonAdjacentToFirstBead.Add(_linkRelaxingBeads[secondBeadIndex]);
+                }
+                
+                var beadListItem = (firstBead, beadsNonAdjacentToFirstBead);
+                
+                nonAdjacentBeadList.Add(beadListItem);
+            }
+
+            return nonAdjacentBeadList;
         }
 
         public List<LinkComponent> SimplifyLink(float H, float K, float alpha, float beta)
@@ -23,7 +75,7 @@ namespace LinkRelaxing
             var forces = CalculateForces(_linkRelaxingBeads, H, K, alpha, beta);
 
             var beadList = new List<Bead>();
-            for (int i = 0; i < forces.Count; i++)
+            for (int i = 0; i < forces.Length; i++)
             {
                 _linkRelaxingBeads[i].bead.position += forces[i];
                 if (!IsBeadSafeToMove(_linkRelaxingBeads, i))
@@ -39,7 +91,7 @@ namespace LinkRelaxing
             return new List<LinkComponent> {linkComponent};
         }
 
-        private static List<Vector3> CalculateForces(
+        private Vector3[] CalculateForces(
             List<LinkRelaxingBead> linkRelaxingBeads,
             float H,
             float K,
@@ -47,83 +99,79 @@ namespace LinkRelaxing
             float beta
         )
         {
-            var forces = new List<Vector3>();
-            for (int i = 0; i < linkRelaxingBeads.Count; i++) forces.Add(new Vector3());
+            var forces = new Vector3[linkRelaxingBeads.Count];
 
-            ApplyMechanicalForces(linkRelaxingBeads, forces, H, beta);
-            ApplyElectricalForces(linkRelaxingBeads, forces, K, alpha);
+            ApplyMechanicalForces(forces, H, beta);
+            ApplyElectricalForces(forces, K, alpha);
             ApplyForceLimit(forces);
 
             return forces;
         }
 
-        private static void ApplyMechanicalForces(
-            List<LinkRelaxingBead> linkRelaxingBeads,
-            List<Vector3> forces,
+        private void ApplyMechanicalForces(
+            Vector3[] forces,
             float H,
             float beta
         )
         {
-            for (int firstBeadIndex = 0; firstBeadIndex < linkRelaxingBeads.Count - 1; firstBeadIndex++)
+            for (var currentBeadIndex = 0; currentBeadIndex < _adjacentBeads.Count; currentBeadIndex++)
             {
-                var firstBead = linkRelaxingBeads[firstBeadIndex];
-                for (int secondBeadIndex = firstBeadIndex + 1;
-                    secondBeadIndex < linkRelaxingBeads.Count;
-                    secondBeadIndex++)
-                {
-                    var secondBead = linkRelaxingBeads[secondBeadIndex];
+                var adjacentBeadTuple = _adjacentBeads[currentBeadIndex];
+                
+                var currentBead = adjacentBeadTuple.Item1;
 
-                    if (firstBead.IsBeadAdjacent(secondBead))
-                    {
-                        var forceDirection = secondBead.bead.position - firstBead.bead.position;
-                        forceDirection.Normalize();
+                var firstAdjacentBead = adjacentBeadTuple.Item2.Item1;
+                var secondAdjacentBead = adjacentBeadTuple.Item2.Item2;
 
-                        var forceMagnitude = H * (float) Math.Pow(forceDirection.magnitude, beta + 1);
-
-                        var mechanicalForce = forceMagnitude * forceDirection;
-
-                        forces[firstBeadIndex] += mechanicalForce;
-                        forces[secondBeadIndex] -= mechanicalForce;
-                    }
-                }
+                forces[currentBeadIndex] += MechanicalForce(H, beta, currentBead, firstAdjacentBead);
+                forces[currentBeadIndex] += MechanicalForce(H, beta, currentBead, secondAdjacentBead);
             }
         }
 
-        private static void ApplyElectricalForces(
-            List<LinkRelaxingBead> linkRelaxingBeads,
-            List<Vector3> forces,
+        private Vector3 MechanicalForce(float H, float beta, LinkRelaxingBead firstBead, LinkRelaxingBead secondBead)
+        {
+            var forceDirection = secondBead.bead.position - firstBead.bead.position;
+            forceDirection.Normalize();
+            
+            var forceMagnitude = H * (float) Math.Pow(forceDirection.magnitude, beta + 1);
+            
+            var mechanicalForce = forceMagnitude * forceDirection;
+
+            return mechanicalForce;
+        }
+
+        private void ApplyElectricalForces(
+            Vector3[] forces,
             float K,
             float alpha
         )
         {
-            for (int firstBeadIndex = 0; firstBeadIndex < linkRelaxingBeads.Count - 1; firstBeadIndex++)
+            for (var currentBeadIndex = 0; currentBeadIndex < _nonAdjacentBeads.Count; currentBeadIndex++)
             {
-                var firstBead = linkRelaxingBeads[firstBeadIndex];
-                for (int secondBeadIndex = firstBeadIndex + 1;
-                    secondBeadIndex < linkRelaxingBeads.Count;
-                    secondBeadIndex++)
+                var (currentBead, linkRelaxingBeads) = _nonAdjacentBeads[currentBeadIndex];
+
+                foreach (var secondBead in linkRelaxingBeads)
                 {
-                    var secondBead = linkRelaxingBeads[secondBeadIndex];
-
-                    if (!firstBead.IsBeadAdjacent(secondBead))
-                    {
-                        var forceDirection = secondBead.bead.position - firstBead.bead.position;
-                        forceDirection.Normalize();
-
-                        var forceMagnitude = -K * (float) Math.Pow(forceDirection.magnitude, -2 - alpha);
-
-                        var electricalForce = forceMagnitude * forceDirection;
-
-                        forces[firstBeadIndex] += electricalForce;
-                        forces[secondBeadIndex] -= electricalForce;
-                    }
+                    forces[currentBeadIndex] += ElectricalForce(K, alpha, currentBead, secondBead);                    
                 }
             }
         }
-
-        private static void ApplyForceLimit(List<Vector3> forces)
+        
+        private Vector3 ElectricalForce(float K, float alpha, LinkRelaxingBead firstBead, LinkRelaxingBead secondBead)
         {
-            for (int i = 0; i < forces.Count; i++)
+            var forceDirection = secondBead.bead.position - firstBead.bead.position;
+            forceDirection.Normalize();
+            
+            var forceMagnitude = -K * (float) Math.Pow(forceDirection.magnitude, -2 - alpha);
+            
+            var electricalForce = forceMagnitude * forceDirection;
+
+            return electricalForce;
+        }
+
+        private static void ApplyForceLimit(Vector3[] forces)
+        {
+            for (int i = 0; i < forces.Length; i++)
             {
                 if (forces[i].magnitude > D_MAX)
                 {

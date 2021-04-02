@@ -21,6 +21,7 @@ namespace LinkRelaxing
 
         public bool IsBeadAdjacent(LinkRelaxingBead other)
         {
+            if (componentIndex == other.componentIndex && _order == other._order) return false;
             if (componentIndex != other.componentIndex) return false;
 
             if (_order == 0 && other._order == _numBeadsInThisComponent - 1) return true;
