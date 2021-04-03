@@ -21,10 +21,10 @@ namespace LinkRelaxing
 
         public bool IsSegmentAdjacent(Segment other)
         {
-            if (firstBead.IsBeadAdjacent(other.firstBead)) return true;
-            if (firstBead.IsBeadAdjacent(other.secondBead)) return true;
-            if (secondBead.IsBeadAdjacent(other.firstBead)) return true;
-            if (secondBead.IsBeadAdjacent(other.secondBead)) return true;
+            if (firstBead.IsSameBead(other.firstBead)) return true;
+            if (firstBead.IsSameBead(other.secondBead)) return true;
+            if (secondBead.IsSameBead(other.firstBead)) return true;
+            if (secondBead.IsSameBead(other.secondBead)) return true;
 
             return false;
         }

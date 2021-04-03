@@ -18,10 +18,15 @@ namespace LinkRelaxing
             _order = order;
             _numBeadsInThisComponent = numBeadsInThisComponent;
         }
+        
+        public bool IsSameBead(LinkRelaxingBead other)
+        {
+            return componentIndex == other.componentIndex && _order == other._order;
+        }
 
         public bool IsBeadAdjacent(LinkRelaxingBead other)
         {
-            if (componentIndex == other.componentIndex && _order == other._order) return false;
+            if(IsSameBead(other)) return false;
             if (componentIndex != other.componentIndex) return false;
 
             if (_order == 0 && other._order == _numBeadsInThisComponent - 1) return true;
