@@ -70,36 +70,36 @@ namespace LinkRelaxing
             return nonAdjacentBeadList;
         }
 
+        // Use arrays as much as possible
         public List<LinkComponent> SimplifyLink(float H, float K, float alpha, float beta)
         {
-            var forces = CalculateForces(_linkRelaxingBeads, H, K, alpha, beta);
+            var forces = CalculateForces(H, K, alpha, beta);
 
-            var beadList = new List<Bead>();
+            var beadList = new Bead[forces.Length];
             for (int i = 0; i < forces.Length; i++)
             {
                 _linkRelaxingBeads[i].bead.position += forces[i];
-                if (!IsBeadSafeToMove(_linkRelaxingBeads, i))
+                if (!IsBeadSafeToMove(i))
                 {
                     _linkRelaxingBeads[i].bead.position -= forces[i];
                 }
 
-                beadList.Add(_linkRelaxingBeads[i].bead);
+                beadList[i] = _linkRelaxingBeads[i].bead;
             }
 
-            var linkComponent = new LinkComponent(beadList);
+            var linkComponent = new LinkComponent(beadList.ToList());
 
             return new List<LinkComponent> {linkComponent};
         }
 
         private Vector3[] CalculateForces(
-            List<LinkRelaxingBead> linkRelaxingBeads,
             float H,
             float K,
             float alpha,
             float beta
         )
         {
-            var forces = new Vector3[linkRelaxingBeads.Count];
+            var forces = new Vector3[_linkRelaxingBeads.Count];
 
             ApplyMechanicalForces(forces, H, beta);
             ApplyElectricalForces(forces, K, alpha);
@@ -203,10 +203,10 @@ namespace LinkRelaxing
             return linkRelaxingBeads;
         }
 
-        private static bool IsBeadSafeToMove(List<LinkRelaxingBead> linkRelaxingBeads, int currentBeadIndex)
+        private bool IsBeadSafeToMove(int currentBeadIndex)
         {
-            var currentBeadSegments = GetCurrentBeadSegments(linkRelaxingBeads, currentBeadIndex);
-            var nonAdjacentBeadSegments = GetNonAdjacentBeadSegments(linkRelaxingBeads, currentBeadSegments);
+            var currentBeadSegments = GetCurrentBeadSegments(currentBeadIndex);
+            var nonAdjacentBeadSegments = GetNonAdjacentBeadSegments(currentBeadSegments);
 
             foreach (var currentBeadSegment in currentBeadSegments)
             {
@@ -225,22 +225,21 @@ namespace LinkRelaxing
             return true;
         }
 
-        private static List<Segment> GetCurrentBeadSegments(
-            List<LinkRelaxingBead> linkRelaxingBeads,
+        private List<Segment> GetCurrentBeadSegments(
             int currentBeadIndex
         )
         {
             var currentBeadSegments = new List<Segment>();
 
-            for (int otherBeadIndex = 0; otherBeadIndex < linkRelaxingBeads.Count; otherBeadIndex++)
+            for (int otherBeadIndex = 0; otherBeadIndex < _linkRelaxingBeads.Count; otherBeadIndex++)
             {
                 if (otherBeadIndex == currentBeadIndex) continue;
-                if (linkRelaxingBeads[otherBeadIndex].IsBeadAdjacent(linkRelaxingBeads[currentBeadIndex]))
+                if (_linkRelaxingBeads[otherBeadIndex].IsBeadAdjacent(_linkRelaxingBeads[currentBeadIndex]))
                 {
                     currentBeadSegments.Add(
                         new Segment(
-                            linkRelaxingBeads[currentBeadIndex],
-                            linkRelaxingBeads[otherBeadIndex]
+                            _linkRelaxingBeads[currentBeadIndex],
+                            _linkRelaxingBeads[otherBeadIndex]
                         )
                     );
                 }
@@ -249,28 +248,27 @@ namespace LinkRelaxing
             return currentBeadSegments;
         }
 
-        private static List<Segment> GetNonAdjacentBeadSegments(
-            List<LinkRelaxingBead> linkRelaxingBeads,
+        private List<Segment> GetNonAdjacentBeadSegments(
             List<Segment> currentBeadSegments
         )
         {
             var beadSegments = new List<Segment>();
 
-            for (int firstBeadIndex = 0; firstBeadIndex < linkRelaxingBeads.Count - 1; firstBeadIndex++)
+            for (int firstBeadIndex = 0; firstBeadIndex < _linkRelaxingBeads.Count - 1; firstBeadIndex++)
             {
-                var firstBead = linkRelaxingBeads[firstBeadIndex];
+                var firstBead = _linkRelaxingBeads[firstBeadIndex];
 
                 for (int secondBeadIndex = firstBeadIndex + 1;
-                    secondBeadIndex < linkRelaxingBeads.Count;
+                    secondBeadIndex < _linkRelaxingBeads.Count;
                     secondBeadIndex++)
                 {
-                    var secondBead = linkRelaxingBeads[secondBeadIndex];
+                    var secondBead = _linkRelaxingBeads[secondBeadIndex];
+
+                    if (!firstBead.IsBeadAdjacent(secondBead)) continue;
+                    
                     var newSegment = new Segment(firstBead, secondBead);
 
-                    if (
-                        !IsSegmentAdjacentToAnySegments(newSegment, currentBeadSegments) &&
-                        firstBead.IsBeadAdjacent(secondBead)
-                    )
+                    if (!IsSegmentAdjacentToAnySegments(newSegment, currentBeadSegments))
                     {
                         beadSegments.Add(newSegment);
                     }
@@ -280,7 +278,7 @@ namespace LinkRelaxing
             return beadSegments;
         }
 
-        private static bool IsSegmentAdjacentToAnySegments(Segment s, List<Segment> sList)
+        private bool IsSegmentAdjacentToAnySegments(Segment s, List<Segment> sList)
         {
             foreach (var segment in sList)
             {
