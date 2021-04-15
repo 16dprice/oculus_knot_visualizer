@@ -1,19 +1,20 @@
+using Domain;
 using UnityEngine;
 
 namespace LinkRelaxing
 {
     public class Segment
     {
-        public Vector3 P0;
-        public Vector3 P1;
+        public Bead P0;
+        public Bead P1;
 
-        private LinkRelaxingBead firstBead;
-        private LinkRelaxingBead secondBead;
+        public LinkRelaxingBead firstBead;
+        public LinkRelaxingBead secondBead;
 
         public Segment(LinkRelaxingBead firstBead, LinkRelaxingBead secondBead)
         {
-            P0 = firstBead.bead.position;
-            P1 = secondBead.bead.position;
+            P0 = firstBead.bead;
+            P1 = secondBead.bead;
 
             this.firstBead = firstBead;
             this.secondBead = secondBead;
