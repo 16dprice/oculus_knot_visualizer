@@ -9,12 +9,12 @@ namespace LinkRelaxing
     public class LinkRelaxer
     {
         // D_MAX must be less than D_CLOSE
-        private const float D_MAX = 0.05f;
-        private const float D_CLOSE = 0.1f;
+        private const float D_MAX = 0.0005f;
+        private const float D_CLOSE = 0.001f;
 
-        private List<LinkRelaxingBead> _linkRelaxingBeads;
-        private int[] _componentStartIndices;
-        private Segment[] _segments;
+        private readonly List<LinkRelaxingBead> _linkRelaxingBeads;
+        private readonly int[] _componentStartIndices;
+        private readonly Segment[] _segments;
         
         public LinkRelaxer(List<LinkComponent> linkComponents)
         {
