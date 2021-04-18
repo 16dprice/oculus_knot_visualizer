@@ -11,7 +11,7 @@ namespace LinkRelaxing
         {
             var u = S1.P1.position - S1.P0.position;
             var v = S2.P1.position - S2.P0.position;
-            var w = S1.P0.position - S2.P1.position;
+            var w = S1.P0.position - S2.P0.position;
 
             var a = Vector3.Dot(u, u);
             var b = Vector3.Dot(u, v);
