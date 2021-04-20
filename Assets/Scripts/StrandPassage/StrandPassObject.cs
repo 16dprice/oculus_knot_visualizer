@@ -17,11 +17,11 @@ namespace StrandPassage
         [SerializeField] int SecondStrandComponent = 0;
         [SerializeField] int FirstStrandSegment = 0;
         [SerializeField] int SecondStrandSegment = 0;
-
-        private int _previousFirstStrandSegment = 0;
-        private int _previousSecondStrandSegment = 0;
+        
         private int _previousFirstStrandComponent = 0;
         private int _previousSecondStrandComponent = 0;
+        private int _previousFirstStrandSegment = 0;
+        private int _previousSecondStrandSegment = 0;
         void Start()
         {
             var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
@@ -33,12 +33,14 @@ namespace StrandPassage
         private void Update()
         {
             if (
-                _previousFirstStrandSegment != FirstStrandSegment ||
-                _previousSecondStrandSegment != SecondStrandSegment ||
                 _previousFirstStrandComponent != FirstStrandComponent ||
-                _previousSecondStrandComponent != SecondStrandComponent
+                _previousSecondStrandComponent != SecondStrandComponent ||
+                _previousFirstStrandSegment != FirstStrandSegment ||
+                _previousSecondStrandSegment != SecondStrandSegment
                 )
             {
+                
+                
                 var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
                 var strandPassProvider = new StrandPassProvider(beadsProvider.GetLinkComponents(),
                     (FirstStrandComponent, FirstStrandSegment), (SecondStrandComponent, SecondStrandSegment));
@@ -46,10 +48,10 @@ namespace StrandPassage
             
                 MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
                 
-                _previousFirstStrandSegment = FirstStrandSegment;
-                _previousSecondStrandSegment = SecondStrandSegment;
                 _previousFirstStrandComponent = FirstStrandComponent;
                 _previousSecondStrandComponent = SecondStrandComponent;
+                _previousFirstStrandSegment = FirstStrandSegment;
+                _previousSecondStrandSegment = SecondStrandSegment;
             }
         }
     }   
