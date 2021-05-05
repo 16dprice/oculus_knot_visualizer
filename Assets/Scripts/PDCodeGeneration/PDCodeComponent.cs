@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Domain;
 
 namespace PDCodeGeneration
 {
@@ -8,9 +9,9 @@ namespace PDCodeGeneration
         public readonly List<PDCodeBeadPair> BeadPairs;
         private readonly List<PDCodeBead> _beadList;
 
-        public PDCodeComponent(Component component, int componentIndex)
+        public PDCodeComponent(LinkComponent linkComponent, int componentIndex)
         {
-            _beadList = GetPDCodeBeads(component.BeadList, componentIndex);
+            _beadList = GetPDCodeBeads(linkComponent.BeadList, componentIndex);
             BeadPairs = GetBeadPairs();
         }
 

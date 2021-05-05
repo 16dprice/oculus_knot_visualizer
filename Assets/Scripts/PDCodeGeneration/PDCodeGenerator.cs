@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using BeadsProviders;
+using Domain;
 
 namespace PDCodeGeneration
 {
@@ -15,19 +17,20 @@ namespace PDCodeGeneration
 
         private void SetComponentList(ILinkBeadsProvider provider)
         {
-            var beadsList = provider.GetBeadsList();
-            var componentList = new List<PDCodeComponent>();
+            var linkComponentList = provider.GetLinkComponents();
+            var pdCodeComponentList = new List<PDCodeComponent>();
 
-            for (int componentIndex = 0; componentIndex < beadsList.Count; componentIndex++)
+            for (int componentIndex = 0; componentIndex < linkComponentList.Count; componentIndex++)
             {
-                var genericComponent = new Component(
-                    beadsList[componentIndex].Select(beadVector => new Bead(beadVector)).ToList()
+                pdCodeComponentList.Add(
+                    new PDCodeComponent(
+                        linkComponentList[componentIndex],
+                        componentIndex
+                    )
                 );
-                
-                componentList.Add(new PDCodeComponent(genericComponent, componentIndex));
             }
 
-            _componentList = componentList;
+            _componentList = pdCodeComponentList;
         }
 
         public List<CrossingPair> GetPDList()
