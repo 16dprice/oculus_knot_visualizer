@@ -16,6 +16,11 @@ namespace UI
             _componentList = beadsProvider.GetLinkComponents();
         }
 
+        public LinkStickModel(List<LinkComponent> componentList)
+        {
+            _componentList = componentList;
+        }
+
         public List<GameObject> GetKnotMeshObjects(int sides, float radius)
         {
             var knotMeshObjects = new List<GameObject>();
