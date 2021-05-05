@@ -1,31 +1,31 @@
 using Domain;
-using UnityEngine;
+using LinkRelaxing;
 
 namespace LinkRelaxing
 {
     public class Segment
     {
-        public Bead P0;
-        public Bead P1;
+        public readonly Bead P0;
+        public readonly Bead P1;
 
-        public LinkRelaxingBead firstBead;
-        public LinkRelaxingBead secondBead;
+        private readonly LinkRelaxingBead _firstBead;
+        private readonly LinkRelaxingBead _secondBead;
 
         public Segment(LinkRelaxingBead firstBead, LinkRelaxingBead secondBead)
         {
             P0 = firstBead.bead;
             P1 = secondBead.bead;
 
-            this.firstBead = firstBead;
-            this.secondBead = secondBead;
+            _firstBead = firstBead;
+            _secondBead = secondBead;
         }
 
         public bool IsSegmentAdjacent(Segment other)
         {
-            if (firstBead.IsSameBead(other.firstBead)) return true;
-            if (firstBead.IsSameBead(other.secondBead)) return true;
-            if (secondBead.IsSameBead(other.firstBead)) return true;
-            if (secondBead.IsSameBead(other.secondBead)) return true;
+            if (_firstBead.IsSameBead(other._firstBead)) return true;
+            if (_firstBead.IsSameBead(other._secondBead)) return true;
+            if (_secondBead.IsSameBead(other._firstBead)) return true;
+            if (_secondBead.IsSameBead(other._secondBead)) return true;
 
             return false;
         }

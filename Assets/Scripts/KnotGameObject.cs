@@ -34,21 +34,12 @@ public class KnotGameObject : MonoBehaviour
 
     void Start()
     {
-        // var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
-        // var linkStickModel = new LinkStickModel(beadsProvider);
-        //
-        // MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
         var beadsProvider = new DefaultFileBeadsProvider(8, 22, 1);
-        // var beadsProvider = new DefaultFileBeadsProvider(6, 3, 3);
+        
         _linkComponents = beadsProvider.GetLinkComponents();
         _linkStickModel = new LinkStickModel(_linkComponents);
         _linkRelaxer = new LinkRelaxer(_linkComponents);
-
-        // DisplayAsSpheres(_linkComponents[0].BeadList);
-        // foreach (var component in _linkComponents)
-        // {
-        //     DisplayAsBeadsAndCylinders(component.BeadList);
-        // }
+        
         MeshManipulation.DisplayLink(transform, _linkStickModel, sides, radius);
     }
     
@@ -62,74 +53,8 @@ public class KnotGameObject : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
-
-            // foreach (var linkComponent in _linkComponents)
-            // {
-            //     foreach (var bead in linkComponent.BeadList)
-            //     {
-            //         Debug.Log($"{bead.position.x}, {bead.position.y}, {bead.position.z}");
-            //     }
-            // }
-            
-            // DisplayAsSpheres(_linkComponents[0].BeadList);
-            // foreach (var component in _linkComponents)
-            // {
-            //     DisplayAsBeadsAndCylinders(component.BeadList);
-            // }
             _linkStickModel = new LinkStickModel(_linkComponents);
             MeshManipulation.DisplayLink(transform, _linkStickModel, sides, radius);
-
-            // minimize = false;
         }
     }
-
-    private void DisplayAsBeadsAndCylinders(List<Bead> beads)
-    {
-        for(int beadIndex = 0; beadIndex < beads.Count - 1; beadIndex++)
-        {
-            var cylinder = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-
-            cylinder.transform.position = beads[beadIndex].position;
-            cylinder.transform.LookAt(beads[beadIndex + 1].position);
-            cylinder.transform.parent = transform;
-        }
-    }
-
-    private void DisplayAsSpheres(List<Bead> beads)
-    {
-        var length = beads.Count;
-        for (int i = 0; i < length; i++)
-        {
-            var bead = beads[i];
-            
-            var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sphere.transform.position = bead.position;
-            sphere.transform.parent = transform;
-            
-            sphere.GetComponent<Renderer>().material.SetColor("_Color", new Color((float) i / length, 0, 1, 1));
-        }
-    }
-
-    // private void Update()
-    // {
-    //     if (
-    //         Math.Abs(_previousRadius - radius) > 0.1 ||
-    //         _previousSides != sides ||
-    //         _previousCrossingNumber != CrossingNumber ||
-    //         _previousOrdering != Ordering ||
-    //         _previousNumComponents != NumComponents
-    //     )
-    //     {
-    //         var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
-    //         var linkStickModel = new LinkStickModel(beadsProvider);
-    //         
-    //         MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
-    //
-    //         _previousRadius = radius;
-    //         _previousSides = sides;
-    //         _previousCrossingNumber = CrossingNumber;
-    //         _previousOrdering = Ordering;
-    //         _previousNumComponents = NumComponents;
-    //     }
-    // }
 }
