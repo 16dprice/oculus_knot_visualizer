@@ -19,7 +19,7 @@ public class KnotGameObject : MonoBehaviour
 
     public int NumComponents {get; set;} = 1;
     public int CrossingNumber {get; set;} = 8;
-    public int Ordering {get; set;} = 22;
+    public int Ordering {get; set;} = 21;
 
     private float _previousRadius = 0.5f;
     private int _previousSides = 6;
@@ -34,7 +34,7 @@ public class KnotGameObject : MonoBehaviour
 
     void Start()
     {
-        var beadsProvider = new DefaultFileBeadsProvider(8, 22, 1);
+        var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering);
         
         _linkComponents = beadsProvider.GetLinkComponents();
         _linkStickModel = new LinkStickModel(_linkComponents);
