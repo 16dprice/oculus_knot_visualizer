@@ -1,69 +1,60 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using BeadsProviders;
+using Domain;
+using LinkRelaxing;
+using UI;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class KnotGameObject : MonoBehaviour
 {
-    [SerializeField] float radius = 0.5f;
-    [SerializeField] [Range(3, 20)] int sides = 6;
-    [SerializeField] private int crossingNumber = 3;
-    [SerializeField] private int ordering = 1;
-    [SerializeField] private int numComponents = 1;
+    [SerializeField] float radius = 0.2f;
+    [SerializeField] int sides = 6;
+    [SerializeField] bool minimize = false;
+    [SerializeField] float H = 0.62f;
+    [SerializeField] float K = 12.98f;
+    [SerializeField] float alpha = 4;
+    [SerializeField] float beta = 1;
+
+    public int NumComponents {get; set;} = 1;
+    public int CrossingNumber {get; set;} = 8;
+    public int Ordering {get; set;} = 21;
 
     private float _previousRadius = 0.5f;
     private int _previousSides = 6;
-    
+
     private int _previousCrossingNumber = 3;
-    private int _previousOrdering = 1;
     private int _previousNumComponents = 1;
+    private int _previousOrdering = 1;
+
+    private LinkStickModel _linkStickModel;
+    private List<LinkComponent> _linkComponents;
+    private LinkRelaxer _linkRelaxer;
 
     void Start()
     {
-        DisplayLink();
+        var beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering);
+        
+        _linkComponents = beadsProvider.GetLinkComponents();
+        _linkStickModel = new LinkStickModel(_linkComponents);
+        _linkRelaxer = new LinkRelaxer(_linkComponents);
+        
+        MeshManipulation.DisplayLink(transform, _linkStickModel, sides, radius);
     }
-
-    void Update()
+    
+    private void Update()
     {
-        if (
-            Math.Abs(_previousRadius - radius) > 0.1 ||
-            _previousSides != sides ||
-            _previousCrossingNumber != crossingNumber ||
-            _previousOrdering != ordering ||
-            _previousNumComponents != numComponents
-        )
+        if (minimize)
         {
+            _linkComponents = _linkRelaxer.SimplifyLink(H, K, alpha, beta);
+            
             foreach (Transform child in transform)
             {
                 Destroy(child.gameObject);
             }
-
-            DisplayLink();
-
-            _previousRadius = radius;
-            _previousSides = sides;
-            _previousCrossingNumber = crossingNumber;
-            _previousOrdering = ordering;
-            _previousNumComponents = numComponents;
+            _linkStickModel = new LinkStickModel(_linkComponents);
+            MeshManipulation.DisplayLink(transform, _linkStickModel, sides, radius);
         }
-    }
-
-    void DisplayLink()
-    {
-        var beadsProvider = new DefaultFileBeadsProvider(crossingNumber, ordering, numComponents);
-        var stickModel = new LinkStickModel(beadsProvider);
-
-        var knotMeshObjects = stickModel.GetKnotMeshObjects(sides, radius);
-
-        foreach (var meshObject in knotMeshObjects)
-        {
-            meshObject.transform.parent = transform;
-            ResetTransform(meshObject);
-        }
-    }
-
-    void ResetTransform(GameObject obj)
-    {
-        obj.transform.localPosition = Vector3.zero;
-        obj.transform.rotation = Quaternion.identity;
-        obj.transform.localScale = Vector3.one;
     }
 }
