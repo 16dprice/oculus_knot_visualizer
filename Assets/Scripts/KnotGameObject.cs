@@ -44,8 +44,6 @@ public class KnotGameObject : MonoBehaviour
         _linkStickModel = new LinkStickModel(_linkComponents);
         _linkRelaxer = new LinkRelaxer(_linkComponents);
 
-        _linkComponents = _linkRelaxer.SimplifyLink(H, K, alpha, beta);
-
         // DisplayAsSpheres(_linkComponents[0].BeadList);
         // foreach (var component in _linkComponents)
         // {
@@ -56,7 +54,7 @@ public class KnotGameObject : MonoBehaviour
     
     private void Update()
     {
-        if (true)
+        if (minimize)
         {
             _linkComponents = _linkRelaxer.SimplifyLink(H, K, alpha, beta);
             
@@ -64,6 +62,14 @@ public class KnotGameObject : MonoBehaviour
             {
                 Destroy(child.gameObject);
             }
+
+            // foreach (var linkComponent in _linkComponents)
+            // {
+            //     foreach (var bead in linkComponent.BeadList)
+            //     {
+            //         Debug.Log($"{bead.position.x}, {bead.position.y}, {bead.position.z}");
+            //     }
+            // }
             
             // DisplayAsSpheres(_linkComponents[0].BeadList);
             // foreach (var component in _linkComponents)
@@ -72,6 +78,8 @@ public class KnotGameObject : MonoBehaviour
             // }
             _linkStickModel = new LinkStickModel(_linkComponents);
             MeshManipulation.DisplayLink(transform, _linkStickModel, sides, radius);
+
+            // minimize = false;
         }
     }
 

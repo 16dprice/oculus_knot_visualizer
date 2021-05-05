@@ -4,6 +4,7 @@ using Domain;
 using LinkRelaxing;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -16,6 +17,7 @@ namespace UI
 
         [SerializeField] private GameObject _beadPrefab;
         [SerializeField] private GameObject _linkGameObject;
+        [SerializeField] private Text _forcesData;
         private readonly List<GameObject> _beadPrefabObjects = new List<GameObject>();
 
         private List<Bead> _component = new List<Bead>();
@@ -25,7 +27,7 @@ namespace UI
         private Vector3 _currentTouchPos = Vector3.zero;
         
         private float H = 0.62f;
-        private float K = 12.98f;
+        private float K = 5f;
 
         private void Update()
         {
@@ -33,9 +35,16 @@ namespace UI
             var rightTrigger = OVRInput.Button.SecondaryIndexTrigger;
             var rightGrip = OVRInput.Button.SecondaryHandTrigger;
             var aButton = OVRInput.Button.One;
-            var bButton = OVRInput.Button.Two;
             var leftStick = OVRInput.Axis2D.PrimaryThumbstick;
             var rightStick = OVRInput.Axis2D.SecondaryThumbstick;
+            
+            K += 0.1f * OVRInput.Get(rightStick).x;
+            if (K > 10) K = 10;
+            if (K < 0) K = 0;
+
+            H += OVRInput.Get(leftStick).x;
+            if (H > 100) H = 100;
+            if (H < 0) H = 0;
 
             if (OVRInput.Get(leftTrigger))
             {
@@ -50,25 +59,14 @@ namespace UI
                 CompleteComponent();
             }
 
-            if (OVRInput.GetDown(bButton))
-            {
-                DestroyBeads();
-                DestroyLink();
-            }
-
             if (OVRInput.Get(rightGrip))
             {
                 var alpha = 4f;
                 var beta = 1f;
 
-                K += 10 * OVRInput.Get(rightStick).x;
-                if (K > 1000) K = 1000;
-                if (K < 1) K = 1;
+                var forcesText = $"Electrical Force: {K}\nMechanical Force: {H}";
+                _forcesData.text = forcesText;
 
-                H += 10 * OVRInput.Get(leftStick).x;
-                if (H > 1000) H = 1000;
-                if (H < 1) H = 1;
-                
                 var linkRelaxer = new LinkRelaxer(_link);
                 _link = linkRelaxer.SimplifyLink(H, K, alpha, beta);
                 

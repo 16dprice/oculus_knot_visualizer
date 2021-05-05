@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Domain;
 using UnityEngine;
 
@@ -9,8 +8,8 @@ namespace LinkRelaxing
     public class LinkRelaxer
     {
         // D_MAX must be less than D_CLOSE
-        private const float D_MAX = 0.0005f;
-        private const float D_CLOSE = 0.001f;
+        private const float D_MAX   = 0.02f;
+        private const float D_CLOSE = 0.04f;
 
         private readonly List<LinkRelaxingBead> _linkRelaxingBeads;
         private readonly int[] _componentStartIndices;
@@ -32,7 +31,8 @@ namespace LinkRelaxing
 
             for (var beadIndex = 0; beadIndex < forces.Length; beadIndex++)
             {
-                if (IsBeadInSafePosition(beadIndex)) _linkRelaxingBeads[beadIndex].bead.position += forces[beadIndex];
+                _linkRelaxingBeads[beadIndex].bead.position += forces[beadIndex];
+                if (!IsBeadInSafePosition(beadIndex)) _linkRelaxingBeads[beadIndex].bead.position -= forces[beadIndex];
                 
                 beadList.Add(_linkRelaxingBeads[beadIndex].bead);
                 if (componentIndex == _componentStartIndices.Length)
@@ -131,8 +131,8 @@ namespace LinkRelaxing
 
             foreach (var segment in _segments)
             {
-                if (!firstSegment.IsSegmentAdjacent(segment)) 
-                    if (SegmentDistanceCalculator.SegmentDistance(firstSegment, segment) < D_CLOSE) 
+                if (!firstSegment.IsSegmentAdjacent(segment))
+                    if (SegmentDistanceCalculator.SegmentDistance(firstSegment, segment) < D_CLOSE)
                         return false;
                 
                 if(!secondSegment.IsSegmentAdjacent(segment))
@@ -143,7 +143,7 @@ namespace LinkRelaxing
             return true;
         }
         
-        private static void ApplyForceLimit(Vector3[] forces)
+        private void ApplyForceLimit(Vector3[] forces)
         {
             for (var beadIndex = 0; beadIndex < forces.Length; beadIndex++)
                 if (forces[beadIndex].magnitude > D_MAX)
@@ -178,7 +178,7 @@ namespace LinkRelaxing
             startIndices[0] = 0;
 
             var componentIndex = 1;
-            for (int beadIndex = 1; beadIndex < _linkRelaxingBeads.Count; beadIndex++)
+            for (var beadIndex = 1; beadIndex < _linkRelaxingBeads.Count; beadIndex++)
             {
                 if (_linkRelaxingBeads[beadIndex].componentIndex != _linkRelaxingBeads[beadIndex - 1].componentIndex)
                 {
