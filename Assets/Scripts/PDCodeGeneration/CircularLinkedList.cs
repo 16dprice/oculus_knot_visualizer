@@ -24,5 +24,23 @@ namespace PDCodeGeneration
             currentNode.SetNext(firstNode);
             firstNode.SetPrev(currentNode);
         }
+
+        public List<PDCodeBeadPair> GetAllPDCodeBeadPairs()
+        {
+            var allPairs = new List<PDCodeBeadPair>();
+
+            var count = 0;
+            var currentNode = firstNode;
+
+            while (count < length)
+            {
+                allPairs.Add(new PDCodeBeadPair(currentNode.bead, currentNode.next.bead));
+                currentNode = currentNode.next;
+                
+                count++;
+            }
+
+            return allPairs;
+        }
     }
 }

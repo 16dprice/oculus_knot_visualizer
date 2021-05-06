@@ -2,27 +2,27 @@ namespace PDCodeGeneration
 {
     public class ListNode
     {
-        private PDCodeBead _bead;
-        private ListNode _prev;
-        private ListNode _next;
+        public PDCodeBead bead;
+        public ListNode prev;
+        public ListNode next;
         
         public ListNode(PDCodeBead bead, ListNode prev, ListNode next)
         {
-            _bead = bead;
-            _prev = prev;
-            _next = next;
+            this.bead = bead;
+            this.prev = prev;
+            this.next = next;
         }
 
         public void SetPrev(ListNode node)
         {
-            _prev = node;
-            node._next = this;
+            prev = node;
+            node.next = this;
         }
 
         public void SetNext(ListNode node)
         {
-            _next = node;
-            node._prev = this;
+            next = node;
+            node.prev = this;
         }
     }
 }
