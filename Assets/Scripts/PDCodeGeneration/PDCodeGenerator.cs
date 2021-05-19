@@ -12,12 +12,17 @@ namespace PDCodeGeneration
 
         public PDCodeGenerator(ILinkBeadsProvider provider)
         {
-            SetComponentList(provider);
+            SetComponentList(provider.GetLinkComponents());
         }
 
-        private void SetComponentList(ILinkBeadsProvider provider)
+        public PDCodeGenerator(List<LinkComponent> linkComponentList)
         {
-            var linkComponentList = provider.GetLinkComponents();
+            SetComponentList(linkComponentList);
+        }
+
+        private void SetComponentList(List<LinkComponent> linkComponentList)
+        {
+            // var linkComponentList = provider.GetLinkComponents();
             var pdCodeComponentList = new List<PDCodeComponent>();
 
             for (int componentIndex = 0; componentIndex < linkComponentList.Count; componentIndex++)

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using BeadsProviders;
 using NUnit.Framework;
-using PDCodeGeneration;
+using PDCodeTEMP;
 using UnityEngine;
 
 namespace Tests
@@ -11,31 +11,34 @@ namespace Tests
         [Test]
         public void LinkedListTest()
         {
-            var beadsProvider = new DefaultFileBeadsProvider(3, 1);
+            var beadsProvider = new DefaultFileBeadsProvider(3, 2);
             var beads = beadsProvider.GetLinkComponents()[0].BeadList;
-
-            var pdCodeBeads = new List<PDCodeBead>();
-            for (int i = 0; i < beads.Count; i++)
-            {
-                pdCodeBeads.Add(new PDCodeBead(beads[i], 1, i));
-            }
-
-            var circularLinkedList = new CircularLinkedList(pdCodeBeads);
-            var allPairs = circularLinkedList.GetAllPDCodeBeadPairs();
+            var pdCodeComponent = new PDCodeComponent(beads);
+            var pdCodeLink = new PDCodeLink(new List<PDCodeComponent> {pdCodeComponent});
             
-            Debug.Log(circularLinkedList.length);
-            for (var i = 0; i < allPairs.Count; i++)
+            foreach (var component in pdCodeLink.componentList)
             {
-                for (var j = i + 1; j < allPairs.Count; j++)
+                var beadList = component.ToList();
+                foreach (var bead in beadList)
                 {
-                    if (allPairs[i].DoesIntersectOtherBeadPair(allPairs[j]))
-                    {
-                        Debug.Log($"{allPairs[i].first.position} & {allPairs[i].second.position}");
-                        Debug.Log($"{allPairs[j].first.position} & {allPairs[j].second.position}\n");
-                    }
+                    Debug.Log($"{bead.bead.position}");
                 }
             }
             
+            pdCodeLink.InsertExtraBeads();
+            Debug.Log("--------------------------------\n");
+            
+            foreach (var component in pdCodeLink.componentList)
+            {
+                var beadList = component.ToList();
+                foreach (var bead in beadList)
+                {
+                    Debug.Log($"{bead.bead.position}");
+                }
+            }
+            
+            
+
             Assert.That(true);
         }
     }
