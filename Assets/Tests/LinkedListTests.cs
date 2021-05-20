@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using BeadsProviders;
 using NUnit.Framework;
 using PDCodeTEMP;
-using UnityEngine;
 
 namespace Tests
 {
@@ -11,7 +10,7 @@ namespace Tests
         [Test]
         public void LinkedListTest()
         {
-            var beadsProvider = new DefaultFileBeadsProvider(6, 3, 3);
+            var beadsProvider = new DefaultFileBeadsProvider(3, 2);
 
             var componentList = new List<PDCodeComponent>();
             foreach (var component in beadsProvider.GetLinkComponents())
@@ -42,8 +41,8 @@ namespace Tests
             //         Debug.Log($"{bead.bead.position}");
             //     }
             // }
-
-            pdCodeLink.GetComponentsWithStrandsSet();
+            
+            pdCodeLink.GetCrossingPairs();
 
             Assert.That(true);
         }

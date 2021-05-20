@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace PDCodeGeneration
+namespace PDCodeTEMP
 {
     public class CrossingPair
     {
@@ -25,8 +25,8 @@ namespace PDCodeGeneration
             int strand3 = under.second.strand;
             int strand2, strand4;
 
-            Vector2 underStrandVec = under.second.position - under.first.position;
-            Vector2 overStrandVec1 = over.first.position - under.first.position;
+            Vector2 underStrandVec = under.second.bead.position - under.first.bead.position;
+            Vector2 overStrandVec1 = over.first.bead.position - under.first.bead.position;
 
             if (Vector2.SignedAngle(underStrandVec, overStrandVec1) > 0)
             {
@@ -47,10 +47,10 @@ namespace PDCodeGeneration
             var (pair1IntersectionParameterValue, pair2IntersectionParameterValue) = 
                 pair1.GetIntersectionParameterizationValues(pair2);
 
-            var firstSegmentZValAtCrossing = pair1.first.position.z + pair1IntersectionParameterValue *
-                (pair1.second.position.z - pair1.first.position.z);
-            var secondSegmentZValAtCrossing = pair2.first.position.z + pair2IntersectionParameterValue *
-                (pair2.second.position.z - pair2.first.position.z);
+            var firstSegmentZValAtCrossing = pair1.first.bead.position.z + pair1IntersectionParameterValue *
+                (pair1.second.bead.position.z - pair1.first.bead.position.z);
+            var secondSegmentZValAtCrossing = pair2.first.bead.position.z + pair2IntersectionParameterValue *
+                (pair2.second.bead.position.z - pair2.first.bead.position.z);
 
             if (firstSegmentZValAtCrossing > secondSegmentZValAtCrossing)
             {

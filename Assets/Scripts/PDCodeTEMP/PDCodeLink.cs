@@ -7,22 +7,47 @@ namespace PDCodeTEMP
     public class PDCodeLink
     {
         public List<PDCodeComponent> componentList;
-        
+
         public PDCodeLink(List<PDCodeComponent> componentList)
         {
             this.componentList = componentList;
+            SetComponentsWithStrandsSet();
         }
 
-        public List<PDCodeComponent> GetComponentsWithStrandsSet()
+        public List<CrossingPair> GetCrossingPairs()
+        {
+            var crossingPairs = new List<CrossingPair>();
+            
+            var beadPairs = GetAllPDCodeBeadPairs();
+            SetBeadPairIntersectingPairs(beadPairs);
+            
+            foreach (var beadPair in beadPairs)
+            {
+                if (beadPair.pairsThatIntersect.Count == 1)
+                {
+                    crossingPairs.Add(new CrossingPair(beadPair, beadPair.pairsThatIntersect[0]));
+                    beadPair.pairsThatIntersect[0].pairsThatIntersect = new List<PDCodeBeadPair>();
+                }
+            }
+
+            foreach (var pair in crossingPairs)
+            {
+                Debug.Log(pair.GetPrintString());
+            }
+            
+            return crossingPairs;
+        }
+
+        private void SetComponentsWithStrandsSet()
         {
             InsertExtraBeads();
-            
+
             var components = new List<PDCodeComponent>();
             var beadPairs = GetAllPDCodeBeadPairs();
             var startStrandNumber = 1;
             var currentStrand = startStrandNumber;
             var maxStrandNumber = startStrandNumber;
-            
+
             SetBeadPairIntersectingPairs(beadPairs);
 
             foreach (var component in componentList)
@@ -38,18 +63,17 @@ namespace PDCodeTEMP
                 }
 
                 maxStrandNumber--;
-                Debug.Log($"Max Strand: {maxStrandNumber}");
 
                 currentBead = component.firstBead;
                 for (var beadIndex = 0; beadIndex < component.length; beadIndex++, currentBead = currentBead.GetNext())
                 {
                     currentBead.strand = currentStrand;
-                    
+
                     var currentBeadPair = beadPairs.First(
                         beadPair =>
                             beadPair.first == currentBead && beadPair.second == currentBead.GetNext() ||
                             beadPair.first == currentBead.GetNext() && beadPair.second == currentBead
-                        );
+                    );
 
                     if (currentBeadPair.pairsThatIntersect.Count == 1)
                     {
@@ -61,25 +85,18 @@ namespace PDCodeTEMP
                 startStrandNumber = maxStrandNumber + 1;
                 currentStrand = startStrandNumber;
                 maxStrandNumber = startStrandNumber;
+                
+                components.Add(component);
             }
 
-            foreach (var component in componentList)
-            {
-                var list = component.ToList();
-                foreach (var thing in list)
-                {
-                    Debug.Log(thing.strand);
-                }
-            }
-            
-            return components;
+            componentList = components;
         }
 
-        public void InsertExtraBeads()
+        private void InsertExtraBeads()
         {
             var beadPairs = GetAllPDCodeBeadPairs();
             SetBeadPairIntersectingPairs(beadPairs);
-            
+
             while (NeedsExtraBeads(beadPairs))
             {
                 foreach (var beadPair in beadPairs)
@@ -90,30 +107,26 @@ namespace PDCodeTEMP
                         break;
                     }
                 }
-                
+
                 beadPairs = GetAllPDCodeBeadPairs();
                 SetBeadPairIntersectingPairs(beadPairs);
             }
         }
 
-        private bool NeedsExtraBeads(List<PDCodeBeadPair> beadPairs)
-        {
-            return beadPairs.Any(beadPair => beadPair.pairsThatIntersect.Count > 1);
-        }
+        private bool NeedsExtraBeads(List<PDCodeBeadPair> beadPairs) =>
+            beadPairs.Any(beadPair => beadPair.pairsThatIntersect.Count > 1);
 
-        public void SetBeadPairIntersectingPairs(List<PDCodeBeadPair> allBeadPairs)
+        private void SetBeadPairIntersectingPairs(List<PDCodeBeadPair> allBeadPairs)
         {
             for (var i = 0; i < allBeadPairs.Count; i++)
             {
                 allBeadPairs[i].ClearIntersectingPairs();
-                
+
                 for (var j = 0; j < allBeadPairs.Count; j++)
                 {
                     if (i == j) continue;
-                    if (allBeadPairs[i].DoesIntersectOtherBeadPair(allBeadPairs[j]))
-                    {
+                    if (allBeadPairs[i].DoesIntersectOtherBeadPair(allBeadPairs[j])) 
                         allBeadPairs[i].pairsThatIntersect.Add(allBeadPairs[j]);
-                    }
                 }
             }
         }
