@@ -48,6 +48,7 @@ namespace PDCodeTEMP
 
         public List<PDCodeBeadPair> GetAllPDCodeBeadPairs()
         {
+            RecalculateLength();
             var allPairs = new List<PDCodeBeadPair>();
         
             var count = 0;

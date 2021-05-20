@@ -5,6 +5,7 @@ namespace PDCodeTEMP
     public class PDCodeBead
     {
         public Bead bead;
+        public int strand;
 
         private PDCodeBead _next;
         private PDCodeBead _prev;
