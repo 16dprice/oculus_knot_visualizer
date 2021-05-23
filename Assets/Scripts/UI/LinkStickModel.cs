@@ -22,6 +22,17 @@ namespace UI
             _componentList = componentList;
         }
 
+        public void SetLinkComponentGameObjects(List<GameObject> linkComponentGameObjects)
+        {
+            if (_componentList.Count == linkComponentGameObjects.Count)
+            {
+                for (int i = 0; i < _componentList.Count; i++)
+                {
+                    _componentList[i].ComponentGameObject = linkComponentGameObjects[i];
+                }
+            }
+        }
+
         public List<GameObject> GetKnotMeshObjects(int sides, float radius)
         {
             var knotMeshObjects = new List<GameObject>();

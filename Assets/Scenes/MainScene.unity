@@ -970,6 +970,7 @@ MonoBehaviour:
   SecondStrandComponent: 0
   FirstStrandSegment: 0
   SecondStrandSegment: 0
+  beadsToHighlight: 03000000
 --- !u!4 &1734560281
 Transform:
   m_ObjectHideFlags: 0
