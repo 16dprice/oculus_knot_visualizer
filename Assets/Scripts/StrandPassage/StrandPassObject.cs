@@ -8,6 +8,8 @@ namespace StrandPassage
 {
     public class StrandPassObject : MonoBehaviour
     {
+        public bool DisplayCrossings = false;
+        
         private float radius = 0.5f;
         private int sides = 6;
 
@@ -25,6 +27,8 @@ namespace StrandPassage
         private int _previousFirstStrandSegment = 0;
         private int _previousSecondStrandSegment = 0;
 
+        private List<GameObject> linkComponents;
+
         private List<LinkComponent> _linkComponents;
 
         void Start()
@@ -34,8 +38,10 @@ namespace StrandPassage
 
             var linkStickModel = new LinkStickModel(_linkComponents);
 
-            MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
+            linkComponents = MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
         }
+
+        
 
         private void Update()
         {
@@ -53,12 +59,23 @@ namespace StrandPassage
                 );
                 var linkStickModel = new LinkStickModel(strandPassProvider);
 
-                MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
+                linkComponents = MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
 
                 _previousFirstStrandComponent = FirstStrandComponent;
                 _previousSecondStrandComponent = SecondStrandComponent;
                 _previousFirstStrandSegment = FirstStrandSegment;
                 _previousSecondStrandSegment = SecondStrandSegment;
+            }
+
+            if (DisplayCrossings)
+            {
+                for (int i = 0; i < linkComponents.Count; i++)
+                {
+                    var linkComponentMeshRenderer = linkComponents[i].GetComponent<MeshRenderer>();
+                    linkComponentMeshRenderer.material.SetColor("_Color", Color.red);
+                }
+
+                DisplayCrossings = !DisplayCrossings;
             }
         }
     }

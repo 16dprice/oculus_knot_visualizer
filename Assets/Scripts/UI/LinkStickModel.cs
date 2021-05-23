@@ -3,12 +3,13 @@ using BeadsProviders;
 using Domain;
 using UnityEngine;
 
+
 namespace UI
 {
     public class LinkStickModel
     {
         const float PI = 3.1415926535898f;
-    
+
         private readonly List<LinkComponent> _componentList;
 
         public LinkStickModel(ILinkBeadsProvider beadsProvider)
@@ -35,6 +36,8 @@ namespace UI
 
         private GameObject GetKnotMeshObject(List<Bead> beads, int sides, float radius)
         {
+            var _knotMaterial = Resources.Load<Material>("KnotMaterial");
+            
             if (beads.Count < 3) return null;
 
             var newKnot = new GameObject();
@@ -46,10 +49,12 @@ namespace UI
 
             mesh.vertices = GetVertices(beads, sides, radius);
             mesh.triangles = GetTriangles(beads, sides);
+            mesh.uv.Initialize();
+            mesh.uv = GetUvs(beads.Count * sides);
             mesh.RecalculateNormals();
 
             meshFilter.mesh = mesh; //assign the mesh
-            meshRenderer.material.SetColor("_Color", Color.white); //assign it some arbitrary color.
+            meshRenderer.sharedMaterial = _knotMaterial; //assign our new knot material
 
             return newKnot;
         }
@@ -151,6 +156,18 @@ namespace UI
             triangles[p - 1] = 0;
 
             return triangles;
+        }
+
+        private Vector2[] GetUvs(int numberOfUvs)
+        {
+            var uvs = new Vector2[numberOfUvs];
+
+            for (int i = 0; i < numberOfUvs; i++)
+            {
+                uvs[i] = new Vector2(1.0f, 1.0f);
+            }
+
+            return uvs;
         }
     }
 }

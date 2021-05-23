@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
+
 
 namespace UI
 {
     public static class MeshManipulation
     {
-        public static void DisplayLink(Transform parentTransform, LinkStickModel stickModel, int sides = 6, float radius = 0.02f)
+        public static List<GameObject> DisplayLink(Transform parentTransform, LinkStickModel stickModel, int sides = 6, float radius = 0.02f)
         {
             foreach (Transform child in parentTransform)
             {
@@ -21,6 +23,8 @@ namespace UI
                     ResetTransform(meshObject);
                 }
             }
+
+            return knotMeshObjects;
         }
     
         static void ResetTransform(GameObject obj)
