@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Domain;
-using BeadsProviders;
 using UnityEngine;
 
-namespace StrandPassage
+namespace BeadsProviders
 {
     public class StrandPassProvider : ILinkBeadsProvider
     {

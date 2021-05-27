@@ -47,7 +47,7 @@ namespace UI
 
         private GameObject GetKnotMeshObject(List<Bead> beads, int sides, float radius)
         {
-            var _knotMaterial = Resources.Load<Material>("KnotMaterial");
+            var knotMaterial = Resources.Load<Material>("KnotMaterial");
             
             if (beads.Count < 3) return null;
 
@@ -56,16 +56,14 @@ namespace UI
             var meshFilter = newKnot.AddComponent(typeof(MeshFilter)) as MeshFilter;
             var meshRenderer = newKnot.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
 
-            var mesh = new Mesh();
+            var mesh = new Mesh {vertices = GetVertices(beads, sides, radius), triangles = GetTriangles(beads, sides)};
 
-            mesh.vertices = GetVertices(beads, sides, radius);
-            mesh.triangles = GetTriangles(beads, sides);
             mesh.uv.Initialize();
             mesh.uv = GetUvs(beads.Count * sides);
             mesh.RecalculateNormals();
 
             meshFilter.mesh = mesh; //assign the mesh
-            meshRenderer.sharedMaterial = _knotMaterial; //assign our new knot material
+            meshRenderer.sharedMaterial = knotMaterial; //assign our new knot material
 
             return newKnot;
         }
@@ -116,7 +114,7 @@ namespace UI
             return points;
         }
 
-        private int[] GetTriangles(List<Bead> beads, int sides)
+        private static int[] GetTriangles(List<Bead> beads, int sides)
         {
             var triangles = new int[beads.Count * 6 * sides];
             int p, passed;
@@ -169,7 +167,7 @@ namespace UI
             return triangles;
         }
 
-        private Vector2[] GetUvs(int numberOfUvs)
+        private static Vector2[] GetUvs(int numberOfUvs)
         {
             var uvs = new Vector2[numberOfUvs];
 

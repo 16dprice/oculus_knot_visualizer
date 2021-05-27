@@ -429,6 +429,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 894002863}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &600224280 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100002, guid: 126d619cf4daa52469682f85c1378b4a,
+    type: 3}
+  m_PrefabInstance: {fileID: 1875170336}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &798645474 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 482130, guid: 126d619cf4daa52469682f85c1378b4a,
@@ -965,12 +971,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d009cc87f466d14dbb4b1905cc9b5fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DisplayCrossings: 0
+  displayCrossings: 0
   FirstStrandComponent: 0
   SecondStrandComponent: 0
   FirstStrandSegment: 0
   SecondStrandSegment: 0
-  beadsToHighlight: 03000000
+  centerEyeAnchor: {fileID: 600224280}
 --- !u!4 &1734560281
 Transform:
   m_ObjectHideFlags: 0
@@ -1177,6 +1183,10 @@ PrefabInstance:
     - target: {fileID: 400004, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2037080, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
+      propertyPath: field of view
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: 8100000, guid: 126d619cf4daa52469682f85c1378b4a, type: 3}
       propertyPath: m_Enabled
