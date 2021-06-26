@@ -11,8 +11,8 @@ namespace StrandPassage
 {
     public class StrandPassObject : MonoBehaviour
     {
-        public bool displayCrossings = false;
-        private bool _previousDisplayCrossings = false;
+        private bool displayCrossings = true;
+        private bool _previousDisplayCrossings = true;
         
         private float radius = 0.5f;
         private int sides = 6;
@@ -89,7 +89,7 @@ namespace StrandPassage
 
         private void HighlightBeads(ILinkBeadsProvider beadsProvider)
         {
-            var whichBeads = PerspectiveCrossingDetection.SortCrossingBeads(beadsProvider, _linkComponents.Count);
+            var whichBeads = PerspectiveCrossingDetection.SortCrossingBeads(beadsProvider, _linkComponents.Count, _centerEyeAnchorTransform, transform);
 
             for (int i = 0; i < _linkComponents.Count; i++)
             {

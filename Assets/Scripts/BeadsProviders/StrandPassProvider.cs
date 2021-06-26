@@ -7,6 +7,11 @@ namespace BeadsProviders
     public class StrandPassProvider : ILinkBeadsProvider
     {
         private List<LinkComponent> _linkComponents = null;
+
+        public StrandPassProvider(List<LinkComponent> linkComponents)
+        {
+            _linkComponents = linkComponents;
+        }
         
         //(int, int) tuple represents the component and segment number of the strands being passed
         public StrandPassProvider(List<LinkComponent> linkComponents, (int, int) firstStrandSegment, (int, int) secondStrandSegment)

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using BeadsProviders;
 using UnityEngine;
@@ -9,11 +10,40 @@ namespace StrandPassage
 {
     public static class PerspectiveCrossingDetection
     {
-        //TODO: change perspective based on camera position and rotation
         
-        public static int[][] SortCrossingBeads(ILinkBeadsProvider beadsProvider, int numberOfComponents)
+        public static int[][] SortCrossingBeads(ILinkBeadsProvider beadsProvider, int numberOfComponents, Transform centerEyeAnchorTransform, Transform strandPassObjTransform)
         {
-            var generator = new PDCodeGenerator(beadsProvider);
+            var orthoLinkComponents = beadsProvider.GetLinkComponents();
+            var perspectiveLinkComponents = new List<LinkComponent>();
+            
+            var cameraAntiRotation = Quaternion.Euler(-1* centerEyeAnchorTransform.rotation.eulerAngles);
+            var cameraAntiPosition = -1* centerEyeAnchorTransform.position;
+            
+            foreach (var component in orthoLinkComponents)
+            {
+                var beadList = component.BeadList;
+                var perspectiveBeadList = new List<Bead>();
+
+                foreach (var bead in beadList)
+                {
+                    var movedBead = bead.position + cameraAntiPosition;
+                    
+                    var rotatedMovedBead = cameraAntiRotation * movedBead;
+
+                    var increasingFactor = IncreasingFactor(rotatedMovedBead.z);
+
+                    rotatedMovedBead.x *= increasingFactor;
+                    rotatedMovedBead.y *= increasingFactor;
+
+                    perspectiveBeadList.Add(new Bead(rotatedMovedBead));
+                }
+                
+                perspectiveLinkComponents.Add(new LinkComponent(perspectiveBeadList));
+            }
+
+            var perspectiveBeadsProvider = new StrandPassProvider(perspectiveLinkComponents);
+            
+            var generator = new PDCodeGenerator(perspectiveBeadsProvider);
             var crossingPairs = generator.GetPDList();
             
             var pdLinkComponents = new List<PDLinkComponent>(numberOfComponents);
@@ -42,6 +72,11 @@ namespace StrandPassage
             }
 
             return linkCrossingBeadIndexes;
+        }
+
+        private static float IncreasingFactor(float depth)
+        {
+            return Mathf.Atan(1 / depth);
         }
     }
 }
