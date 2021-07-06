@@ -8,10 +8,7 @@ namespace UI
     {
         public static void DisplayLink(Transform parentTransform, LinkStickModel stickModel, int sides = 6, float radius = 0.02f)
         {
-            foreach (Transform child in parentTransform)
-            {
-                Object.Destroy(child.gameObject);
-            }
+            DeleteChildren(parentTransform);
 
             var knotMeshObjects = stickModel.GetKnotMeshObjects(sides, radius);
 
@@ -25,6 +22,14 @@ namespace UI
             }
             
             stickModel.SetLinkComponentGameObjects(knotMeshObjects);
+        }
+
+        public static void DeleteChildren(Transform parentTransform)
+        {
+            foreach (Transform child in parentTransform)
+            {
+                Object.Destroy(child.gameObject);
+            }
         }
     
         static void ResetTransform(GameObject obj)

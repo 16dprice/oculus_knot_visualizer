@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using BeadsProviders;
 using Domain;
 using UI;
 using UnityEngine;
-using PDCodeGeneration;
 
 
 namespace StrandPassage
@@ -14,25 +12,13 @@ namespace StrandPassage
         private bool displayCrossings = true;
         private bool _previousDisplayCrossings = true;
         
-        private float radius = 0.5f;
+        private float radius = 0.01f;
         private int sides = 6;
 
-        private int NumComponents = 2;
-        private int CrossingNumber = 6;
-        private int Ordering = 1;
-
-        [SerializeField] int FirstStrandComponent = 0;
-        [SerializeField] int SecondStrandComponent = 0;
-        [SerializeField] int FirstStrandSegment = 0;
-        [SerializeField] int SecondStrandSegment = 0;
-
-        private int _previousFirstStrandComponent = 0;
-        private int _previousSecondStrandComponent = 0;
-        private int _previousFirstStrandSegment = 0;
-        private int _previousSecondStrandSegment = 0;
-
-        private List<LinkComponent> _linkComponents;
+        private List<LinkComponent> _linkComponents = new List<LinkComponent>();
         private ILinkBeadsProvider _beadsProvider;
+
+        private int _previousLinkComponentCount = 0;
 
         [SerializeField] private GameObject centerEyeAnchor;
         private Transform _centerEyeAnchorTransform;
@@ -40,50 +26,46 @@ namespace StrandPassage
         void Start()
         {
             _centerEyeAnchorTransform = centerEyeAnchor.transform;
-            
-            _beadsProvider = new DefaultFileBeadsProvider(CrossingNumber, Ordering, NumComponents);
-            _linkComponents = _beadsProvider.GetLinkComponents();
+        }
 
-            var linkStickModel = new LinkStickModel(_linkComponents);
+        public void AddStrandPassObject(LinkComponent linkComponent)
+        {
+            _previousLinkComponentCount = _linkComponents.Count;
+            _linkComponents.Add(linkComponent);
+        }
 
-            MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
+        public void DeleteStrandPassObject()
+        {
+            _previousLinkComponentCount = _linkComponents.Count;
+            _linkComponents.Clear();
         }
 
         private void Update()
         {
-            if (
-                _previousFirstStrandComponent != FirstStrandComponent ||
-                _previousSecondStrandComponent != SecondStrandComponent ||
-                _previousFirstStrandSegment != FirstStrandSegment ||
-                _previousSecondStrandSegment != SecondStrandSegment
-            )
+            if (_linkComponents.Count != _previousLinkComponentCount)
             {
-                _beadsProvider = new StrandPassProvider(
-                    _linkComponents,
-                    (FirstStrandComponent, FirstStrandSegment),
-                    (SecondStrandComponent, SecondStrandSegment)
-                );
-                _linkComponents = _beadsProvider.GetLinkComponents();
-                
-                var linkStickModel = new LinkStickModel(_beadsProvider);
-                
-                MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
+                if (_linkComponents.Count > 0)
+                {
+                    _beadsProvider = new DrawBeadsProvider(_linkComponents);
+                    var linkStickModel = new LinkStickModel(_beadsProvider);
+                    
+                    MeshManipulation.DisplayLink(transform, linkStickModel, sides, radius);
 
-                _previousFirstStrandComponent = FirstStrandComponent;
-                _previousSecondStrandComponent = SecondStrandComponent;
-                _previousFirstStrandSegment = FirstStrandSegment;
-                _previousSecondStrandSegment = SecondStrandSegment;
-            }
-
-            if (displayCrossings)
-            {
-                HighlightBeads(_beadsProvider);
-                _previousDisplayCrossings = true;
-            } 
-            else if (_previousDisplayCrossings != displayCrossings)
-            {
-                UnHighlightBeads(_linkComponents);
-                _previousDisplayCrossings = false;
+                    if (displayCrossings)
+                    {
+                        HighlightBeads(_beadsProvider);
+                        _previousDisplayCrossings = true;
+                    } 
+                    else if (_previousDisplayCrossings != displayCrossings)
+                    {
+                        UnHighlightBeads(_linkComponents);
+                        _previousDisplayCrossings = false;
+                    }
+                }
+                else
+                {
+                    MeshManipulation.DeleteChildren(transform);
+                }
             }
         }
 

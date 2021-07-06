@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using BeadsProviders;
+using StrandPassage;
 using Domain;
 using UnityEngine;
 
@@ -7,21 +9,25 @@ namespace UI
 {
     public class DrawBeadSpawner : MonoBehaviour
     {
-        private readonly float _radius = 0.02f;
-        private readonly int _sides = 6;
-    
         [SerializeField] private GameObject beadPrefab;
         private readonly List<GameObject> _beadPrefabObjects = new List<GameObject>();
     
-        private readonly List<Bead> _component = new List<Bead>();
-        private readonly List<LinkComponent> _link = new List<LinkComponent>();
+        private List<Bead> _component = new List<Bead>();
 
         private bool _previousTriggerState = false;
-        private bool _currentTriggerState = false;
+        private bool _currentTriggerState;
         private bool _drawingState = false;
     
         private Vector3 _previousTouchPos = Vector3.zero;
         private Vector3 _currentTouchPos = Vector3.zero;
+
+        [SerializeField] private GameObject strandPassGameObject;
+        private StrandPassObject _strandPassObject;
+
+        private void Start()
+        {
+            _strandPassObject = strandPassGameObject.GetComponent<StrandPassObject>();
+        }
 
         private void Update()
         {
@@ -30,23 +36,21 @@ namespace UI
 
             if (_currentTriggerState)
             {
-                if (!_previousTriggerState)
-                {
-                    _drawingState = true;
-                }
+                _drawingState = true;
+                
+                if (!_previousTriggerState) _component.Clear();
             }
             else
             {
                 _drawingState = false;
                 _previousTouchPos = Vector3.zero;
             
-                if (!_previousTriggerState)
+                if (_previousTriggerState)
                 {
-                    _link.Add(new LinkComponent(_component));
-                    _component.Clear();
+                    //passing reference I think. coding around this right now
+                    _strandPassObject.AddStrandPassObject(new LinkComponent(_component));
                 
                     DestroyBeads();
-                    MeshManipulation.DisplayLink(transform, new LinkStickModel(new DrawBeadsProvider(_link)), _sides, _radius);
                 }
             }
 
@@ -65,7 +69,7 @@ namespace UI
             }
 
             if (OVRInput.GetDown(OVRInput.Button.Two))
-                DestroyLink();
+                _strandPassObject.DeleteStrandPassObject();
 
             _previousTriggerState = _currentTriggerState;
         }
@@ -78,16 +82,6 @@ namespace UI
             }
 
             _beadPrefabObjects.Clear();
-        }
-
-        private void DestroyLink()
-        {
-            foreach (Transform child in transform)
-            {
-                Destroy(child.gameObject);
-            }
-        
-            _link.Clear();
         }
     }
 }
